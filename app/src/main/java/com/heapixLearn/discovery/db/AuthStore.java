@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.DB;
+package com.heapixLearn.discovery.db;
 
 import android.content.SharedPreferences;
 

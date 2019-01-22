@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.Server;
+package com.heapixLearn.discovery.server;
 
 public enum TypeOfServerError {
     SERVER_ERROR("Server error");

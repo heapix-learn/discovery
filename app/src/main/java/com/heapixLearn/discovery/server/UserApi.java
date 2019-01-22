@@ -1,6 +1,6 @@
-package com.heapixLearn.discovery.Server;
+package com.heapixLearn.discovery.server;
 
-import com.heapixLearn.discovery.Server.Contacts.ServerContact;
+import com.heapixLearn.discovery.server.contacts.ServerContact;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -10,7 +10,6 @@ import retrofit2.http.Query;
 
 
 public interface UserApi {
-
 
     @POST("/create-contact")
     @Headers({"Content-Type: application/json"})

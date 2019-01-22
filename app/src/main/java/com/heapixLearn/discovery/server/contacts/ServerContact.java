@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.Server.Contacts;
+package com.heapixLearn.discovery.server.contacts;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

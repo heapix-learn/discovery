@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.Server;
+package com.heapixLearn.discovery.server;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
