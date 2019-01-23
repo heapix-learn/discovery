@@ -101,7 +101,7 @@ public class ViewableContactManager {
     }
 
 
-    public ViewableContact getByDBId(ViewableContact data) {
+    public ViewableContact getById(ViewableContact data) {
         FutureTask<ViewableContact> getContact = dbManager.getById(data);
         ViewableContact contact = null;
         new Thread(getContact).start();
@@ -113,17 +113,6 @@ public class ViewableContactManager {
         return contact;
     }
 
-    public ViewableContact getByServerId(ViewableContact data) {
-        FutureTask<ViewableContact> getContact = serverManager.getById(data);
-        ViewableContact contact = null;
-        new Thread(getContact).start();
-        try {
-            contact = getContact.get();
-        } catch (InterruptedException | ExecutionException e) {
-            Log.d(TAG, " ViewableContactManager getContactById from SERVER: " + e);
-        }
-        return contact;
-    }
 
 
     public ArrayList<ViewableContact> getAll() {
