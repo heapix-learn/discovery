@@ -2,7 +2,7 @@ package com.heapixLearn.discovery.domain.contact;
 
 import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.DBStoreContact;
 
-public class DomainDBContact implements DBStoreContact {
+public class DumbDBContact implements DBStoreContact {
     @Override
     public int getId() {
         return 0;
@@ -39,7 +39,7 @@ public class DomainDBContact implements DBStoreContact {
     }
 
     @Override
-    public Boolean isRemote() {
-        return null;
+    public int getRemoteId() {
+        return 0;
     }
 }

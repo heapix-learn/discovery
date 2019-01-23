@@ -2,7 +2,7 @@ package com.heapixLearn.discovery.domain.contact;
 
 import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.UIContact;
 
-public class DomainUIContact implements UIContact {
+public class DumbUIContact implements UIContact {
     @Override
     public int getId() {
         return 0;
@@ -39,7 +39,7 @@ public class DomainUIContact implements UIContact {
     }
 
     @Override
-    public Boolean isRemote() {
-        return null;
+    public int getRemoteId() {
+        return 0;
     }
 }

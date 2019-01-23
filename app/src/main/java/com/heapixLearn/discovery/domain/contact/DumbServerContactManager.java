@@ -6,20 +6,20 @@ import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.Server
 import java.util.ArrayList;
 import java.util.concurrent.FutureTask;
 
-public class DomainServerContactManager implements ServerStoreContactManager {
+public class DumbServerContactManager implements ServerStoreContactManager {
 
     @Override
-    public FutureTask<ViewableContact> create(ViewableContact data, Runnable onSuccess, Runnable onFail) {
+    public FutureTask<ViewableContact> create(ViewableContact data) {
         return null;
     }
 
     @Override
-    public FutureTask<ViewableContact> update(ViewableContact data, Runnable onSuccess, Runnable onFail) {
+    public FutureTask<ViewableContact> update(ViewableContact data) {
         return null;
     }
 
     @Override
-    public FutureTask<ViewableContact> delete(ViewableContact data, Runnable onSuccess, Runnable onFail) {
+    public FutureTask<Boolean> delete(ViewableContact data) {
         return null;
     }
 

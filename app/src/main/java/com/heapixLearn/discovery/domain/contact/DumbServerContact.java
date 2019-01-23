@@ -2,7 +2,7 @@ package com.heapixLearn.discovery.domain.contact;
 
 import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.ServerStoreContact;
 
-public class DomainServerContact implements ServerStoreContact {
+public class DumbServerContact implements ServerStoreContact {
     @Override
     public int getId() {
         return 0;

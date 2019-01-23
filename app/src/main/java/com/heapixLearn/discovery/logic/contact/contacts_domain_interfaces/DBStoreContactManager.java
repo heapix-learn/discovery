@@ -11,4 +11,7 @@ public interface DBStoreContactManager {
     FutureTask<Void> delete(ViewableContact data);
     FutureTask<ViewableContact> getById(ViewableContact data);
     FutureTask<ArrayList<ViewableContact>> getAll();
+    void onContactCreated(ViewableContact contact);
+    void omContactUpDated(ViewableContact contact);
+    void onContactUpdated(ViewableContact contact);
 }

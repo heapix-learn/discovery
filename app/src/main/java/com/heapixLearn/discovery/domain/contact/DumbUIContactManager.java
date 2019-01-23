@@ -1,33 +1,22 @@
 package com.heapixLearn.discovery.domain.contact;
 
-import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.UIContact;
+import com.heapixLearn.discovery.logic.contact.ViewableContact;
 import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.UIContactManager;
 
-import java.util.ArrayList;
+public class DumbUIContactManager implements UIContactManager {
 
-public class DomainUIContactManager implements UIContactManager {
     @Override
-    public void create(UIContact data) {
+    public void onContactDeleted(ViewableContact contact) {
 
     }
 
     @Override
-    public void update(UIContact data) {
+    public void onContactCreated(ViewableContact contact) {
 
     }
 
     @Override
-    public void delete(int id) {
+    public void onContactUpdated(ViewableContact contact) {
 
-    }
-
-    @Override
-    public UIContact getById(int id) {
-        return null;
-    }
-
-    @Override
-    public ArrayList<UIContact> getAll() {
-        return null;
     }
 }

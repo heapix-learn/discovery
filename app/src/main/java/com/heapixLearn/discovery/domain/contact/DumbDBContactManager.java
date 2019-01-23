@@ -6,7 +6,7 @@ import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.DBStor
 import java.util.ArrayList;
 import java.util.concurrent.FutureTask;
 
-public class DomainDBContactManager implements DBStoreContactManager {
+public class DumbDBContactManager implements DBStoreContactManager {
 
 
     @Override
@@ -32,5 +32,20 @@ public class DomainDBContactManager implements DBStoreContactManager {
     @Override
     public FutureTask<ArrayList<ViewableContact>> getAll() {
         return null;
+    }
+
+    @Override
+    public void onContactCreated(ViewableContact contact) {
+
+    }
+
+    @Override
+    public void omContactUpDated(ViewableContact contact) {
+
+    }
+
+    @Override
+    public void onContactUpdated(ViewableContact contact) {
+
     }
 }

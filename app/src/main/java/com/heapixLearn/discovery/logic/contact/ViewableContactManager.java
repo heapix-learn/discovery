@@ -4,21 +4,26 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.heapixLearn.discovery.domain.contact.DomainDBContactManager;
-import com.heapixLearn.discovery.domain.contact.DomainServerContactManager;
+import com.heapixLearn.discovery.domain.contact.DumbDBContactManager;
+import com.heapixLearn.discovery.domain.contact.DumbServerContactManager;
+import com.heapixLearn.discovery.domain.contact.DumbUIContactManager;
 import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.DBStoreContactManager;
 import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.ServerStoreContactManager;
-import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.UIContactManager;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
-public class ViewableContactManager implements UIContactManager {
+public class ViewableContactManager {
     private static String TAG = "!!!LOG!!!";
     static ViewableContactManager instance;
     DBStoreContactManager dbManager;
     ServerStoreContactManager serverManager;
+    DumbUIContactManager dumbUIContactManager = new DumbUIContactManager();
+    DumbDBContactManager dumbDBContactManager = new DumbDBContactManager();
+    DumbServerContactManager dumbServerContactManager = new DumbServerContactManager();
+
+
 
     private ViewableContactManager(DBStoreContactManager dbManager, ServerStoreContactManager serverManager) {
         this.dbManager = dbManager;
@@ -27,13 +32,11 @@ public class ViewableContactManager implements UIContactManager {
 
     public ViewableContactManager getInstance() {
         if (instance == null) {
-            instance = new ViewableContactManager(new DomainDBContactManager(), new DomainServerContactManager());
+            instance = new ViewableContactManager(dumbDBContactManager, dumbServerContactManager);
         }
         return instance;
     }
 
-
-    @Override
     public void create(ViewableContact data, Runnable onSuccess, Runnable onFail) {
         Runnable runnable = () -> {
             FutureTask<ViewableContact> createServerContact = serverManager.create(data);
@@ -55,7 +58,6 @@ public class ViewableContactManager implements UIContactManager {
         new Thread(runnable).start();
     }
 
-    @Override
     public void update(ViewableContact data, Runnable onSuccess, Runnable onFail) {
         Runnable runnable = () -> {
             FutureTask<ViewableContact> updateServer = serverManager.update(data);
@@ -77,7 +79,6 @@ public class ViewableContactManager implements UIContactManager {
         new Thread(runnable).start();
     }
 
-    @Override
     public void delete(ViewableContact data, Runnable onSuccess, Runnable onFail) {
         Runnable runnable = () -> {
             FutureTask<Boolean> deleteFromServer = serverManager.delete(data);
@@ -99,8 +100,8 @@ public class ViewableContactManager implements UIContactManager {
         new Thread(runnable).start();
     }
 
-    @Override
-    public ViewableContact getById(ViewableContact data) {
+
+    public ViewableContact getByDBId(ViewableContact data) {
         FutureTask<ViewableContact> getContact = dbManager.getById(data);
         ViewableContact contact = null;
         new Thread(getContact).start();
@@ -112,9 +113,20 @@ public class ViewableContactManager implements UIContactManager {
         return contact;
     }
 
-    @Override
+    public ViewableContact getByServerId(ViewableContact data) {
+        FutureTask<ViewableContact> getContact = serverManager.getById(data);
+        ViewableContact contact = null;
+        new Thread(getContact).start();
+        try {
+            contact = getContact.get();
+        } catch (InterruptedException | ExecutionException e) {
+            Log.d(TAG, " ViewableContactManager getContactById from SERVER: " + e);
+        }
+        return contact;
+    }
+
+
     public ArrayList<ViewableContact> getAll() {
-        ArrayList<ViewableContact> contactListFromServer = new ArrayList<>();
         ArrayList<ViewableContact> contactListFromDB = new ArrayList<>();
 
         try {
@@ -123,48 +135,23 @@ public class ViewableContactManager implements UIContactManager {
         } catch (InterruptedException | ExecutionException e) {
             Log.d(TAG, " ViewableContactManager getAll from DBContactsManager: " + e);
         }
-
-
-        Runnable copyNewContactFromServer = () -> {
-            try {
-                FutureTask<ArrayList<ViewableContact>> serverTask = serverManager.getAll();
-                new Thread(serverTask).start();
-                contactListFromServer.addAll(serverTask.get());
-            } catch (ExecutionException | InterruptedException e) {
-                Log.d(TAG, " ViewableContactManager getAll from ServerContactsManager: " + e);
-            }
-
-            if (contactListFromServer.size() > contactListFromDB.size()) {
-                ArrayList<ViewableContact> contactsToCreateInDB = new ArrayList<>();
-
-                for (ViewableContact contact: contactListFromServer) {
-                    if(!(contactListFromDB.contains(contact))) {
-                        contactsToCreateInDB.add(contact);
-                    }
-                }
-
-                for (ViewableContact contact: contactsToCreateInDB) {
-                    FutureTask postNewContacts = dbManager.create(contact);
-                    new Thread(postNewContacts).start();
-                }
-            }
-            if(contactListFromServer.size() < contactListFromDB.size()) {
-                ArrayList<ViewableContact> contactsToDeleteFromDB = new ArrayList<>();
-
-                for (ViewableContact contact: contactListFromDB) {
-                    if(!(contactListFromServer.contains(contact))) {
-                        contactsToDeleteFromDB.add(contact);
-                    }
-                }
-
-                for (ViewableContact contact: contactsToDeleteFromDB) {
-                    FutureTask postNewContacts = dbManager.delete(contact);
-                    new Thread(postNewContacts).start();
-                }
-            }
-
-        };
-        new Thread(copyNewContactFromServer).start();
         return contactListFromDB;
     }
+
+
+    public void onServerContactCreated(ViewableContact contact) {
+        dumbDBContactManager.onContactCreated(contact);
+        dumbUIContactManager.onContactCreated(contact);
+    }
+
+    public void onServerContactDelete(ViewableContact contact) {
+        dumbUIContactManager.onContactDeleted(contact);
+        dumbUIContactManager.onContactDeleted(contact);
+    }
+
+    public void onServerContactUpdated(ViewableContact contact) {
+        dumbUIContactManager.onContactUpdated(contact);
+        dumbUIContactManager.onContactUpdated(contact);
+    }
+
 }
