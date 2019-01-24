@@ -1,7 +1,6 @@
 package com.heapixLearn.discovery.DAO.LocalDBContact;
 
-import android.arch.persistence.room.Room;
-import android.content.Context;
+import com.heapixLearn.discovery.App;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -15,15 +14,15 @@ public class LocalDBContactManager {
     private Thread threadInsert;
     private Thread threadUpdate;
 
-    public static synchronized LocalDBContactManager getInstance(Context context) {
+    public static synchronized LocalDBContactManager getInstance() {
         if (instance == null) {
-            instance = new LocalDBContactManager(context);
+            instance = new LocalDBContactManager();
         }
         return instance;
     }
 
-    private LocalDBContactManager(Context applicationContext) {
-        ContactDB db = Room.databaseBuilder(applicationContext, ContactDB.class, "contactDB").build();
+    private LocalDBContactManager() {
+        AppDB db = App.getInstance().getDatabase();
         contactDAO = db.getContactDAO();
     }
 
