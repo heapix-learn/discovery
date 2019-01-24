@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.db;
+package com.heapixLearn.discovery.db.authorization;
 
 import android.content.SharedPreferences;
 

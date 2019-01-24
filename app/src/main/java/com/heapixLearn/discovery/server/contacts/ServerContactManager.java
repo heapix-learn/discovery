@@ -1,7 +1,7 @@
 package com.heapixLearn.discovery.server.contacts;
 
 
-import com.heapixLearn.discovery.db.AuthStore;
+import com.heapixLearn.discovery.db.authorization.AuthStore;
 import com.heapixLearn.discovery.RunnableWithObject;
 import com.heapixLearn.discovery.server.Controller;
 import com.heapixLearn.discovery.server.ServerAnswer;

@@ -26,6 +26,10 @@ public class User {
     @Expose
     private String phone;
 
+    @SerializedName("avatarURL")
+    @Expose
+    private String avatarURL;
+
     public String getId() {
         return id;
     }
@@ -74,5 +78,12 @@ public class User {
         this.phone = phone;
     }
 
+    public void setAvatarURL(String avatarURL) {
+        this.avatarURL = avatarURL;
+    }
+
+    public String getAvatarURL() {
+        return avatarURL;
+    }
 }
 

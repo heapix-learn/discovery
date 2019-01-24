@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Discovery</string>
+    <string name="discover">Discover</string>
+    <string name="phone">\ \ \ Телефон\ \ \ \ </string>
+    <string name="phoneNumber">Номер телефона</string>
+    <string name="emailView">\ \ \ \ Email\ \ \ \ \ </string>
+    <string name="email">Email</string>
+    <string name="textPhoneForVerification">Мы отправим вам СМС с кодом</string>
+    <string name="textEmailForVerification">Мы отправим вам Email с ссылкой для нажатия</string>
+    <string name="forgot_password">Забыл пароль</string>
+    <string name="nickName">Ник</string>
+    <string name="name">Имя</string>
+    <string name="next">Далее</string>
+    <string name="forgot_password_">Забыли пароль?</string>
+    <string name="text_for_forgot_password">Введите ваш ник, телефон или адрес электронной почты, и мы вышлем вам ссылку, чтобы вернуться в вашу учетную запись.</string>
+    <string name="send">Отправить</string>
+    <string name="type_confirm_code">Введите код подтверждения</string>
+    <string name="text_type_confirm_code_phone">Введите код, отправленный на номер </string>
+    <string name="text_type_confirm_code_phone2">Проверьте номер</string>
+    <string name="text_type_confirm_code_phone3">или</string>
+    <string name="text_type_confirm_code_phone4">Отправьте СМС еще раз</string>
+    <string name="confirmation_code">Код подтверждения</string>
+    <string name="password">Пароль</string>
+    <string name="username">Почта, телефон или ник</string>
+    <string name="text_type_confirm_code_email">Перейдите по ссылке отправленной на почту </string>
+    <string name="text_type_confirm_code_email2">Проверьте почту</string>
+    <string name="text_type_confirm_code_email3">или</string>
+    <string name="text_type_confirm_code_email4">Отправьте письмо еще раз</string>
+    <string name="empty_zone">Пустое поле</string>
+    <string name="login">Вход</string>
+    <string name="create_acco">Создать аккаунт</string>
+
+    <string name="google_auth_default_web_client_id">54383859181-nhbi7hmi6bc7ulevhbpd3lsjn6f9uj4a.apps.googleusercontent.com</string>
+    <string name="facebook_application_id_">2016835455060975</string>
+    <string name="google_key">AIzaSyD0t_n5ImwxZ0OYkRKY4lTLBDr3MzzYDXY</string>
+
+
+    <string name="text_success_reg1">Welcom to Discover, </string>
+    <string name="text_success_reg2">You can post photos, videos and your text in places on the map. You can change your nickname at any time.</string>
+    <string name="text_success_reg3">By registering, you accept our</string>
+    <string name="text_success_reg4">Terms, the Data Use Policy and the Cookie Policy.</string>
+    <string name="add_profile">Add profile photo</string>
+    <string name="add_a_profi">Add a profile photo so your friends can recognize you.</string>
+    <string name="photo">PHOTO</string>
+    <string name="skip">Skip</string>
+</resources>

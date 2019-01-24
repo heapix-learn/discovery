@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Discovery</string>
     <string name="discover">Discover</string>
@@ -12,7 +13,7 @@
     <string name="name">Name</string>
     <string name="next">Next</string>
     <string name="forgot_password_">Forgot password?</string>
-    <string name="text_for_forgot_password">Enter your username, phone or email and we\'ll send you a link to get back into your account.</string>
+    <string name="text_for_forgot_password">Enter your username or email and we\'ll send you a link to get back into your account.</string>
     <string name="send">Send</string>
     <string name="type_confirm_code">Type confirmation code</string>
     <string name="text_type_confirm_code_phone">Enter the code that we send to the number </string>

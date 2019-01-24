@@ -13,12 +13,31 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".AppContext">
-        <activity android:name="com.heapixLearn.discovery.MainActivity">
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_application_id_" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_key" />
+
+        <activity android:name="com.heapixLearn.discovery.MainActivity"></activity>
+
+        <activity android:name=".ui.authorization.SignUpActivity" />
+        <activity android:name=".ui.authorization.ForgotPasswordActivity" />
+        <activity android:name=".ui.authorization.SignUpConfirmCodePhoneActivity" />
+        <activity android:name=".ui.authorization.SignUpConfirmCodeEmailActivity" />
+        <activity android:name=".ui.authorization.VerificationActivity" />
+        <activity android:name=".ui.authorization.SuccessRegistrationActivity" />
+        <activity android:name=".ui.authorization.AddPhotoActivity" />
+        <activity android:name=".ui.StartActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.authorization.LoginActivity" ></activity>
     </application>
 
 </manifest>
