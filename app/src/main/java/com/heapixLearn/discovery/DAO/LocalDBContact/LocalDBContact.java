@@ -12,22 +12,24 @@ import java.io.ByteArrayOutputStream;
 @Entity(tableName = "contacts")
 public class LocalDBContact {
 
-    public LocalDBContact(String name, String nick, String email, String phone, int remoteID, Bitmap avatar) {
+    public LocalDBContact(String name, String nick, String email, String phone, int remoteID, Bitmap avatar, boolean isFriend) {
         this.name = name;
         this.nick = nick;
         this.email = email;
         this.phone = phone;
         this.remoteID = remoteID;
         this.avatar = avatar;
+        this.isFriend = isFriend;
     }
 
-    public LocalDBContact(String name, String nick, String email, String phone, int remoteID, byte[] avatarBlob) {
+    public LocalDBContact(String name, String nick, String email, String phone, int remoteID, byte[] avatarBlob, boolean isFriend) {
         this.name = name;
         this.nick = nick;
         this.email = email;
         this.phone = phone;
         this.remoteID = remoteID;
         this.avatarBlob = avatarBlob;
+        this.isFriend = isFriend;
     }
 
     @PrimaryKey(autoGenerate = true)
@@ -39,6 +41,8 @@ public class LocalDBContact {
     private String phone;
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB, name = "avatar")
     private byte[] avatarBlob;
+    @ColumnInfo(name = "is_friend")
+    private boolean isFriend;
     @ColumnInfo(name = "remote_id")
     private int remoteID;
     @Ignore
@@ -107,6 +111,14 @@ public class LocalDBContact {
             }
         });
         converterToBitmap.start();
+    }
+
+    public boolean isFriend() {
+        return isFriend;
+    }
+
+    public void setFriend(boolean friend) {
+        isFriend = friend;
     }
 
     public Bitmap getAvatar() {
