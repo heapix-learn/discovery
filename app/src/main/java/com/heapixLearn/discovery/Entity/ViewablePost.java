@@ -6,7 +6,6 @@ import java.util.List;
 
 public class ViewablePost implements Comparable<ViewablePost> {
     private int id;
-    private int remoteID;
     private int access;
     private int userId;
     private String description;
@@ -31,7 +30,7 @@ public class ViewablePost implements Comparable<ViewablePost> {
 
     @Override
     public int compareTo(ViewablePost o) {
-        return o.getRemoteID() - remoteID;
+        return o.getId() - id;
     }
 
     public int getId() {
@@ -40,14 +39,6 @@ public class ViewablePost implements Comparable<ViewablePost> {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getRemoteID() {
-        return remoteID;
-    }
-
-    public void setRemoteID(int remoteID) {
-        this.remoteID = remoteID;
     }
 
     public int getAccess() {

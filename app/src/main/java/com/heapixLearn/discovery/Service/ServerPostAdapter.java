@@ -31,12 +31,12 @@ public class ServerPostAdapter implements ServerPostAdapterI {
     }
 
     @Override
-    public void delete(ViewablePost post) {
-
+    public boolean delete(ViewablePost post) {
+        return true;
     }
 
     @Override
-    public void update(ViewablePost post) {
-
+    public ViewablePost update(ViewablePost post) {
+        return null;
     }
 }

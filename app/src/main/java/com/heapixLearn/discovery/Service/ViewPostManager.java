@@ -1,5 +1,8 @@
 package com.heapixLearn.discovery.Service;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.heapixLearn.discovery.Entity.ViewablePost;
 
 import java.util.ArrayList;
@@ -16,6 +19,9 @@ public class ViewPostManager {
     private ListIterator<ViewablePost> allPostsIterator;
     private Runnable newPostsRunnable;
     private Thread newPostsThread;
+    private Thread addPostThread;
+    private Thread removePostThread;
+    private Thread updatePostThread;
 
     private final int DB_MAX_AMOUNT = 100;
 
@@ -49,6 +55,7 @@ public class ViewPostManager {
     }
 
     public List<ViewablePost> getFirst(int amount) {
+        joinAllThreads();
         if (newPostsThread != null) {
             try {
                 newPostsThread.join();
@@ -59,31 +66,72 @@ public class ViewPostManager {
         return getSubList(amount);
     }
 
-    public void addPost(ViewablePost post) {
-        ViewablePost newPost = serverAdapter.insert(post);
-        newPost = addPostToDB(newPost);
-        allPosts.add(newPost);
+    public void addPost(ViewablePost post, Runnable onSuccess, Runnable onFail) {
+        Runnable runnable = () -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            ViewablePost newPost = serverAdapter.insert(post);
+
+            if (newPost == null) {
+                handler.post(onFail);
+            } else {
+                addPostToDB(newPost);
+                allPosts.add(newPost);
+                Collections.sort(allPosts);
+                allPostsIterator = allPosts.listIterator(allPostsIterator.nextIndex() + 1);
+                handler.post(onSuccess);
+            }
+        };
+        addPostThread = new Thread(runnable);
+        addPostThread.start();
     }
 
-    public void removePost(ViewablePost post){
-        allPosts.remove(post);
-        dbAdapter.delete(post);
-        serverAdapter.delete(post);
+    public void removePost(ViewablePost post, Runnable onSuccess, Runnable onFail) {
+        Runnable runnable = () -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            if (serverAdapter.delete(post)) {
+                allPosts.remove(post);
+                dbAdapter.delete(post);
+                handler.post(onSuccess);
+            } else {
+                handler.post(onFail);
+            }
+        };
+        removePostThread = new Thread(runnable);
+        removePostThread.start();
     }
 
-    public void updatePost(ViewablePost post){
-        serverAdapter.update(post);
-        dbAdapter.update(post);
+    public void updatePost(ViewablePost post, Runnable onSuccess, Runnable onFail) {
+        Runnable runnable = () -> {
+            Handler handler = new Handler(Looper.getMainLooper());
+            int index = allPosts.indexOf(post);
+            allPosts.remove(dbAdapter.getById(post.getId()));
+
+            ViewablePost newPost = serverAdapter.update(post);
+            if (newPost == null) {
+                handler.post(onFail);
+            } else {
+                dbAdapter.update(post);
+                allPosts.add(index, newPost);
+                handler.post(onSuccess);
+            }
+
+        };
+        updatePostThread = new Thread(runnable);
+        updatePostThread.start();
     }
 
     public List<ViewablePost> getNext(int amount) {
-        for(int i = 0; i< amount; i++) {
+        joinAllThreads();
+        for (int i = 0; i < amount; ) {
             ViewablePost newPost = serverAdapter.getNext();
-            if(!allPosts.contains(newPost)) {
-                newPost = addPostToDB(newPost);
+            if (!allPosts.contains(newPost)) {
+                i++;
+                addPostToDB(newPost);
                 allPosts.add(newPost);
             }
         }
+        Collections.sort(allPosts);
+        allPostsIterator = allPosts.listIterator(allPostsIterator.nextIndex());
         return getSubList(amount);
     }
 
@@ -99,44 +147,58 @@ public class ViewPostManager {
         return list;
     }
 
-    private void checkNewPosts() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    getNewPostsFromServer();
-                    try {
-                        wait(60000);
-                    } catch (InterruptedException e) {
-                    }
-                }
-            }
-        }).start();
+    private void joinAllThreads(){
+        joinThread(newPostsThread);
+        joinThread(updatePostThread);
+        joinThread(removePostThread);
+        joinThread(addPostThread);
     }
 
-    private ViewablePost addPostToDB(ViewablePost post) {
+    private void joinThread(Thread thread) {
+        if (thread != null) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+
+    private void checkNewPosts() {
+        Runnable runnable = () -> {
+            while (true) {
+                getNewPostsFromServer();
+                try {
+                    wait(60000);
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+        new Thread(runnable).start();
+    }
+
+    private void addPostToDB(ViewablePost post) {
         if (dbList.size() > DB_MAX_AMOUNT) {
             ViewablePost p = dbList.get(DB_MAX_AMOUNT);
             dbList.remove(p);
             dbAdapter.delete(p);
         }
-        ViewablePost newPost = dbAdapter.insert(post);
-        dbList.add(newPost);
-        return newPost;
+        dbAdapter.insert(post);
+        dbList.add(post);
     }
 
     private void getNewPostsFromServer() {
-        newPostsThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (serverAdapter.hasNewPosts()) {
-                   allPosts.addAll(serverAdapter.getFirst(20));
-                   Collections.sort(allPosts);
-                   allPostsIterator = allPosts.listIterator(allPostsIterator.nextIndex()+20);
-                }
+        Runnable runnable = () -> {
+            if (serverAdapter.hasNewPosts()) {
+                Handler handler = new Handler(Looper.getMainLooper());
+
+                allPosts.addAll(serverAdapter.getFirst(20));
+                Collections.sort(allPosts);
+                allPostsIterator = allPosts.listIterator(allPostsIterator.nextIndex() + 20);
+
+                handler.post(newPostsRunnable);
             }
-        });
+        };
+        newPostsThread = new Thread(runnable);
         newPostsThread.start();
-        new Thread(newPostsRunnable).start();
     }
 }

@@ -11,6 +11,6 @@ public interface ServerPostAdapterI {
     ViewablePost getById(int id);
     boolean hasNewPosts();
     ViewablePost insert(ViewablePost post);
-    void delete(ViewablePost post);
-    void update(ViewablePost post);
+    boolean delete(ViewablePost post);
+    ViewablePost update(ViewablePost post);
 }
