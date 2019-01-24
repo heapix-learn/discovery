@@ -19,8 +19,7 @@ public class ViewablePost implements Comparable<ViewablePost> {
     private static final int ACCESS_PUBLIC = 1;
     private static final int ACCESS_GLOBAL = 2;
 
-    public ViewablePost(int id, int access, int userId, String description, String title, List<String> imgRefList, List<String> videoRefList, Location location) {
-        this.id = id;
+    public ViewablePost(int access, int userId, String description, String title, List<String> imgRefList, List<String> videoRefList, Location location) {
         this.access = access;
         this.userId = userId;
         this.description = description;

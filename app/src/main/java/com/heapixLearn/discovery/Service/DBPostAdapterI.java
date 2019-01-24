@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface DBPostAdapterI {
     List<ViewablePost> getAll();
-    ViewablePost getById();
-    void insert(ViewablePost post);
+    ViewablePost getById(int id);
+    ViewablePost insert(ViewablePost post);
     void delete(ViewablePost post);
     void update(ViewablePost post);
 }

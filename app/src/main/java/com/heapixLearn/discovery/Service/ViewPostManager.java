@@ -15,16 +15,15 @@ public class ViewPostManager {
     private ArrayList<ViewablePost> allPosts;
     private ListIterator<ViewablePost> allPostsIterator;
     private Runnable newPostsRunnable;
+    private Thread newPostsThread;
+
+    private final int DB_MAX_AMOUNT = 100;
 
     public static synchronized ViewPostManager getInstance() {
         if (instance == null) {
             instance = new ViewPostManager();
         }
         return instance;
-    }
-
-    public void onNewPostsListener(Runnable runnable) {
-        newPostsRunnable = runnable;
     }
 
     private ViewPostManager() {
@@ -34,33 +33,57 @@ public class ViewPostManager {
         checkNewPosts();
     }
 
-    private void initAllPostsList(){
+    public void onNewPostsListener(Runnable runnable) {
+        newPostsRunnable = runnable;
+    }
+
+    private void initAllPostsList() {
         allPosts = new ArrayList<>();
         allPosts.addAll(dbList);
         Collections.sort(allPosts);
     }
 
-    private void initDB(){
+    private void initDB() {
         dbAdapter = new DBPostAdapter();
         dbList = dbAdapter.getAll();
     }
 
     public List<ViewablePost> getFirst(int amount) {
+        if (newPostsThread != null) {
+            try {
+                newPostsThread.join();
+            } catch (InterruptedException e) {
+            }
+        }
         allPostsIterator = allPosts.listIterator();
         return getSubList(amount);
     }
 
-    public List<ViewablePost> getNewPosts(int amount) {
-        return getFirst(amount);
+    public void addPost(ViewablePost post) {
+        ViewablePost newPost = serverAdapter.insert(post);
+        newPost = addPostToDB(newPost);
+        allPosts.add(newPost);
     }
 
-    public void addPost(ViewablePost post){
-        addPostToDB(post);
-        allPosts.add(post);
+    public void removePost(ViewablePost post){
+        allPosts.remove(post);
+        dbAdapter.delete(post);
+        serverAdapter.delete(post);
+    }
 
+    public void updatePost(ViewablePost post){
+        serverAdapter.update(post);
+        dbAdapter.update(post);
     }
 
     public List<ViewablePost> getNext(int amount) {
+        for(int i = 0; i< amount; i++) {
+            ViewablePost newPost = serverAdapter.getNext();
+            if(!allPosts.contains(newPost)) {
+                newPost = addPostToDB(newPost);
+                allPosts.add(newPost);
+            }
+        }
         return getSubList(amount);
     }
 
@@ -81,40 +104,39 @@ public class ViewPostManager {
             @Override
             public void run() {
                 while (true) {
+                    getNewPostsFromServer();
                     try {
                         wait(60000);
                     } catch (InterruptedException e) {
                     }
-                    getNewPostsFromServer();
-                }
-            }
-        });
-    }
-
-    private synchronized void addPostToDB(ViewablePost post){
-        if(dbList.size() > 99){
-            ViewablePost p = dbList.get(dbList.size()-1);
-            dbList.remove(p);
-            dbAdapter.delete(p);
-        }
-        dbList.add(post);
-        dbAdapter.insert(post);
-    }
-
-    private void getNewPostsFromServer() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (serverAdapter.hasNewPosts()) {
-                    int[] newIds = serverAdapter.getNewIds();
-                    for (int i : newIds) {
-                        ViewablePost post = serverAdapter.getById(i);
-                        allPosts.add(post);
-                        addPostToDB(post);
-                    }
                 }
             }
         }).start();
+    }
+
+    private ViewablePost addPostToDB(ViewablePost post) {
+        if (dbList.size() > DB_MAX_AMOUNT) {
+            ViewablePost p = dbList.get(DB_MAX_AMOUNT);
+            dbList.remove(p);
+            dbAdapter.delete(p);
+        }
+        ViewablePost newPost = dbAdapter.insert(post);
+        dbList.add(newPost);
+        return newPost;
+    }
+
+    private void getNewPostsFromServer() {
+        newPostsThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (serverAdapter.hasNewPosts()) {
+                   allPosts.addAll(serverAdapter.getFirst(20));
+                   Collections.sort(allPosts);
+                   allPostsIterator = allPosts.listIterator(allPostsIterator.nextIndex()+20);
+                }
+            }
+        });
+        newPostsThread.start();
         new Thread(newPostsRunnable).start();
     }
 }
