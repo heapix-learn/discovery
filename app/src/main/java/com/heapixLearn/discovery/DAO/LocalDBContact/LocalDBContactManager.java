@@ -3,8 +3,6 @@ package com.heapixLearn.discovery.DAO.LocalDBContact;
 import com.heapixLearn.discovery.App;
 
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
 
 public class LocalDBContactManager {
     private static LocalDBContactManager instance;
@@ -26,24 +24,14 @@ public class LocalDBContactManager {
         contactDAO = db.getContactDAO();
     }
 
-    public FutureTask<List<LocalDBContact>> getAll() {
+    public List<LocalDBContact> getAll() {
         joinAllThreads();
-        return new FutureTask<>(new Callable<List<LocalDBContact>>() {
-            @Override
-            public List<LocalDBContact> call() throws Exception {
-                return contactDAO.getAll();
-            }
-        });
+        return contactDAO.getAll();
     }
 
-    public FutureTask<LocalDBContact> getById(final int id) {
+    public LocalDBContact getById(final int id) {
         joinAllThreads();
-        return new FutureTask<>(new Callable<LocalDBContact>() {
-            @Override
-            public LocalDBContact call() throws Exception {
-                return contactDAO.getById(id);
-            }
-        });
+        return contactDAO.getById(id);
     }
 
     public void insert(final LocalDBContact contact) {
