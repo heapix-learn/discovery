@@ -28,11 +28,21 @@ public class ViewPostManager {
     }
 
     private ViewPostManager() {
-        dbAdapter = new DBPostAdapter();
-        dbList = dbAdapter.getAll();
+        serverAdapter = new ServerPostAdapter();
+        initDB();
+        initAllPostsList();
+        checkNewPosts();
+    }
+
+    private void initAllPostsList(){
+        allPosts = new ArrayList<>();
         allPosts.addAll(dbList);
         Collections.sort(allPosts);
-        checkNewPosts();
+    }
+
+    private void initDB(){
+        dbAdapter = new DBPostAdapter();
+        dbList = dbAdapter.getAll();
     }
 
     public List<ViewablePost> getFirst(int amount) {
@@ -42,6 +52,12 @@ public class ViewPostManager {
 
     public List<ViewablePost> getNewPosts(int amount) {
         return getFirst(amount);
+    }
+
+    public void addPost(ViewablePost post){
+        addPostToDB(post);
+        allPosts.add(post);
+
     }
 
     public List<ViewablePost> getNext(int amount) {
@@ -75,6 +91,16 @@ public class ViewPostManager {
         });
     }
 
+    private synchronized void addPostToDB(ViewablePost post){
+        if(dbList.size() > 99){
+            ViewablePost p = dbList.get(dbList.size()-1);
+            dbList.remove(p);
+            dbAdapter.delete(p);
+        }
+        dbList.add(post);
+        dbAdapter.insert(post);
+    }
+
     private void getNewPostsFromServer() {
         new Thread(new Runnable() {
             @Override
@@ -82,7 +108,9 @@ public class ViewPostManager {
                 if (serverAdapter.hasNewPosts()) {
                     int[] newIds = serverAdapter.getNewIds();
                     for (int i : newIds) {
-                        allPosts.add(serverAdapter.getById(i));
+                        ViewablePost post = serverAdapter.getById(i);
+                        allPosts.add(post);
+                        addPostToDB(post);
                     }
                 }
             }
