@@ -4,12 +4,12 @@ import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.DBStor
 import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.ServerStoreContact;
 import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.UIContact;
 
-public class ViewableContact {
+public class LogicContact {
     DBStoreContact dbContact;
     ServerStoreContact serverContact;
     UIContact uiContact;
 
-    public ViewableContact(DBStoreContact dbContact) {
+    public LogicContact(DBStoreContact dbContact) {
         this.dbContact = dbContact;
     }
 

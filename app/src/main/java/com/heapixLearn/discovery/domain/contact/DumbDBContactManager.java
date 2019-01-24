@@ -1,6 +1,6 @@
 package com.heapixLearn.discovery.domain.contact;
 
-import com.heapixLearn.discovery.logic.contact.ViewableContact;
+import com.heapixLearn.discovery.logic.contact.LogicContact;
 import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.DBStoreContactManager;
 
 import java.util.ArrayList;
@@ -10,42 +10,42 @@ public class DumbDBContactManager implements DBStoreContactManager {
 
 
     @Override
-    public FutureTask<Void> create(ViewableContact data) {
+    public FutureTask<Void> create(LogicContact data) {
         return null;
     }
 
     @Override
-    public FutureTask<Void> update(ViewableContact data) {
+    public FutureTask<Void> update(LogicContact data) {
         return null;
     }
 
     @Override
-    public FutureTask<Void> delete(ViewableContact data) {
+    public FutureTask<Void> delete(LogicContact data) {
         return null;
     }
 
     @Override
-    public FutureTask<ViewableContact> getById(ViewableContact data) {
+    public FutureTask<LogicContact> getById(LogicContact data) {
         return null;
     }
 
     @Override
-    public FutureTask<ArrayList<ViewableContact>> getAll() {
+    public FutureTask<ArrayList<LogicContact>> getAll() {
         return null;
     }
 
     @Override
-    public void onContactCreated(ViewableContact contact) {
+    public void onContactCreated(LogicContact contact) {
 
     }
 
     @Override
-    public void omContactUpDated(ViewableContact contact) {
+    public void omContactUpDated(LogicContact contact) {
 
     }
 
     @Override
-    public void onContactUpdated(ViewableContact contact) {
+    public void onContactUpdated(LogicContact contact) {
 
     }
 }
