@@ -101,6 +101,12 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         });
     }
 
+    public void updateList(ArrayList<Contact> newList){
+        list = new ArrayList<>();
+        list.addAll(newList);
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return list.size();
