@@ -38,39 +38,69 @@ public class ServerContactManager {
 
             @Override
             public void onFailure(Call<List<ServerContact>> call, Throwable t) {
-                onFailure.init(TypeOfServerError.SERVER_ERROR);
+                onFailure.init(TypeOfServerError.INTERNET_DOES_NOT_WORK);
                 onFailure.run();
             }
         });
     }
 
     public void createContact(ServerContact serverContact, final Runnable onSuccess, final RunnableWithObject<TypeOfServerError> onFailure){
-        goWithCallback(userApi.createContact(serverContact, authStore.getToken()), onSuccess, onFailure);
+        userApi.createContact(serverContact, authStore.getToken()).enqueue(new Callback<ServerContact>() {
+            @Override
+            public void onResponse(Call<ServerContact> call, Response<ServerContact> response) {
+                if (isExist(response.body())){
+                    onSuccess.run();
+                }
+                else {
+                    onFailure.init(TypeOfServerError.SERVER_ERROR);
+                    onFailure.run();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ServerContact> call, Throwable t) {
+                onFailure.init(TypeOfServerError.INTERNET_DOES_NOT_WORK);
+                onFailure.run();
+            }
+        });
     }
 
     public void updateContact(ServerContact serverContact, Runnable onSuccess, RunnableWithObject<TypeOfServerError> onFailure){
-        goWithCallback(userApi.updateContact(serverContact, authStore.getToken()), onSuccess, onFailure);
+        getServerAnswerFromServer(userApi.updateContact(serverContact.getId(), serverContact, authStore.getToken()), onSuccess, onFailure);
     }
 
     public void deleteContact(ServerContact serverContact, Runnable onSuccess, RunnableWithObject<TypeOfServerError> onFailure){
-        goWithCallback(userApi.deleteContact(serverContact, authStore.getToken()), onSuccess, onFailure);
+        getServerAnswerFromServer(userApi.deleteContact(serverContact.getId(), authStore.getToken()), onSuccess, onFailure);
     }
 
-    private boolean isExist(List<ServerContact> body){
-        return body!=null;
+    public void getContactById(String id, final RunnableWithObject<ServerContact> onSuccess, final RunnableWithObject<TypeOfServerError> onFailure){
+        userApi.getContactById(id, authStore.getToken()).enqueue(new Callback<ServerContact>() {
+            @Override
+            public void onResponse(Call<ServerContact> call, Response<ServerContact> response) {
+                if (isExist(response.body())){
+                    onSuccess.init(response.body());
+                    onSuccess.run();
+                } else {
+                    onFailure.init(TypeOfServerError.SERVER_ERROR);
+                    onFailure.run();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ServerContact> call, Throwable t) {
+                onFailure.init(TypeOfServerError.INTERNET_DOES_NOT_WORK);
+                onFailure.run();
+            }
+        });
     }
 
-    private void goWithCallback(Call<ServerAnswer> call, final Runnable onSuccess, final RunnableWithObject<TypeOfServerError> onFailure){
+    private void getServerAnswerFromServer(Call<ServerAnswer> call, final Runnable onSuccess, final RunnableWithObject<TypeOfServerError> onFailure) {
         call.enqueue(new Callback<ServerAnswer>() {
             @Override
             public void onResponse(Call<ServerAnswer> call, Response<ServerAnswer> response) {
                 if (isExist(response.body())) {
-                    if (isSuccess(response.body())) {
-                        onSuccess.run();
-                    } else {
-                        onFailure.init(TypeOfServerError.SERVER_ERROR);
-                        onFailure.run();
-                    }
+                    onSuccess.run();
+
                 } else {
                     onFailure.init(TypeOfServerError.SERVER_ERROR);
                     onFailure.run();
@@ -79,18 +109,22 @@ public class ServerContactManager {
 
             @Override
             public void onFailure(Call<ServerAnswer> call, Throwable t) {
-                onFailure.init(TypeOfServerError.SERVER_ERROR);
+                onFailure.init(TypeOfServerError.INTERNET_DOES_NOT_WORK);
                 onFailure.run();
             }
         });
     }
 
-    private boolean isExist(ServerAnswer serverAnswer){
-        return serverAnswer!=null;
+    private boolean isExist(ServerContact body){
+        return body!=null;
     }
 
-    private boolean isSuccess(ServerAnswer serverAnswer){
-        return serverAnswer.getSuccess();
+    private boolean isExist(ServerAnswer body){
+        return body!=null;
+    }
+
+    private boolean isExist(List<ServerContact> body){
+        return body!=null;
     }
 
 }
