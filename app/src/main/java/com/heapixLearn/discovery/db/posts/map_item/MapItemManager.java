@@ -9,6 +9,14 @@ import java.util.ArrayList;
 
 public class MapItemManager {
     private static MapItemManager instance;
+    private DumbAppDB db;
+    private MapItemDAO dao;
+
+    private MapItemManager() {
+        db = DumbApp.getInstance().getDatabase();
+        dao = db.getMapItemDao();
+    }
+
 
     public static MapItemManager getInstance() {
         if (instance == null) {
@@ -18,37 +26,27 @@ public class MapItemManager {
     }
 
     public MapItem getById(int id) {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        MapItemDAO mapItemDao = db.getMapItemDao();
-        return mapItemDao.getByID(id);
+        return dao.getByID(id);
     }
 
 
     public ArrayList<MapItem> getAll() {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        MapItemDAO mapItemDao = db.getMapItemDao();
-        Log.d("!!!!!LOG!!", "doInBackground: " + mapItemDao.getAll().toString());
-        return new ArrayList<>(mapItemDao.getAll());
+        Log.d("!!!!!LOG!!", "doInBackground: " + dao.getAll().toString());
+        return new ArrayList<>(dao.getAll());
     }
 
 
     public void create(MapItem post) {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        MapItemDAO mapItemDao = db.getMapItemDao();
-        mapItemDao.insert(post);
+        dao.insert(post);
     }
 
 
     public void update(MapItem post) {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        MapItemDAO mapItemDao = db.getMapItemDao();
-        mapItemDao.update(post);
+       dao.update(post);
     }
 
 
     public void delete(MapItem mapItem) {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        MapItemDAO mapItemDao = db.getMapItemDao();
-        mapItemDao.delete(mapItem);
+       dao.delete(mapItem);
     }
 }

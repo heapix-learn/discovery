@@ -10,6 +10,13 @@ import java.util.ArrayList;
 
 public class PostImageManager {
     private static PostImageManager instance;
+    private DumbAppDB db;
+    private ImageDAO dao;
+
+    private PostImageManager() {
+        db = DumbApp.getInstance().getDatabase();
+        dao = db.getImageDao();
+    }
 
     public static PostImageManager getInstance() {
         if (instance == null) {
@@ -19,37 +26,27 @@ public class PostImageManager {
     }
 
     public PostImage getById(int id) {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        ImageDAO imagesDao = db.getImageDao();
-        return imagesDao.getByID(id);
+        return dao.getByID(id);
     }
 
 
     public ArrayList<PostImage> getAll() {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        ImageDAO imagesDao = db.getImageDao();
-        Log.d("!!!!!LOG!!", "doInBackground: " + imagesDao.getAll().toString());
-        return new ArrayList<>(imagesDao.getAll());
+        Log.d("!!!!!LOG!!", "doInBackground: " + dao.getAll().toString());
+        return new ArrayList<>(dao.getAll());
     }
 
 
     public void create(PostImage post) {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        ImageDAO imagesDao = db.getImageDao();
-        imagesDao.insert(post);
+        dao.insert(post);
     }
 
 
     public void update(PostImage post) {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        ImageDAO imagesDao = db.getImageDao();
-        imagesDao.update(post);
+        dao.update(post);
     }
 
 
     public void delete(PostImage image) {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        ImageDAO imagesDao = db.getImageDao();
-        imagesDao.delete(image);
+        dao.delete(image);
     }
 }

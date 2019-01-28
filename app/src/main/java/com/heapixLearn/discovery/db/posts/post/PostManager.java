@@ -9,6 +9,13 @@ import java.util.ArrayList;
 
 public class PostManager {
     private static PostManager instance;
+    private DumbAppDB db;
+    private PostDAO dao;
+
+    private PostManager() {
+        db = DumbApp.getInstance().getDatabase();
+        dao = db.getPostDao();
+    }
 
     public static PostManager getInstance() {
         if (instance == null) {
@@ -18,37 +25,27 @@ public class PostManager {
     }
 
     public Post getById(int id) {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        PostDAO postDao = db.getPostDao();
-        return postDao.getByID(id);
+        return dao.getByID(id);
     }
 
 
     public ArrayList<Post> getAll() {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        PostDAO postDao = db.getPostDao();
-        Log.d("!!!!!LOG!!", "doInBackground: " + postDao.getAll().toString());
-        return new ArrayList<>(postDao.getAll());
+        Log.d("!!!!!LOG!!", "doInBackground: " + dao.getAll().toString());
+        return new ArrayList<>(dao.getAll());
     }
 
 
     public void create(Post post) {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        PostDAO postDao = db.getPostDao();
-        postDao.insert(post);
+        dao.insert(post);
     }
 
 
     public void update(Post post) {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        PostDAO postDao = db.getPostDao();
-        postDao.update(post);
+        dao.update(post);
     }
 
 
     public void delete(Post post) {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        PostDAO postDao = db.getPostDao();
-        postDao.delete(post);
+        dao.delete(post);
     }
 }

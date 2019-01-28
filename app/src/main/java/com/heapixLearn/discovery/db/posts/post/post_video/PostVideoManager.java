@@ -10,6 +10,14 @@ import java.util.ArrayList;
 
 public class PostVideoManager {
     private static PostVideoManager instance;
+    private DumbAppDB db;
+    private VideoDAO dao;
+
+    private PostVideoManager() {
+        db = DumbApp.getInstance().getDatabase();
+        dao = db.getVideoDao();
+    }
+
 
     public static PostVideoManager getInstance() {
         if (instance == null) {
@@ -19,37 +27,27 @@ public class PostVideoManager {
     }
 
     public PostVideo getById(int id) {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        VideoDAO videoDAO = db.getVideoDao();
-        return videoDAO.getByID(id);
+        return dao.getByID(id);
     }
 
 
     public ArrayList<PostVideo> getAll() {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        VideoDAO videoDAO = db.getVideoDao();
-        Log.d("!!!!!LOG!!", "doInBackground: " + videoDAO.getAll().toString());
-        return new ArrayList<>(videoDAO.getAll());
+        Log.d("!!!!!LOG!!", "doInBackground: " + dao.getAll().toString());
+        return new ArrayList<>(dao.getAll());
     }
 
 
     public void create(PostVideo post) {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        VideoDAO videoDAO = db.getVideoDao();
-        videoDAO.insert(post);
+        dao.insert(post);
     }
 
 
     public void update(PostVideo post) {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        VideoDAO videoDAO = db.getVideoDao();
-        videoDAO.update(post);
+        dao.update(post);
     }
 
 
     public void delete(PostVideo data) {
-        DumbAppDB db = DumbApp.getInstance().getDatabase();
-        VideoDAO videoDAO = db.getVideoDao();
-        videoDAO.delete(data);
+        dao.delete(data);
     }
 }
