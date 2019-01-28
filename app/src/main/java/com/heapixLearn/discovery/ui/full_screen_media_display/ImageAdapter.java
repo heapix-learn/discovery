@@ -35,7 +35,7 @@ public class ImageAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        View itemView = mLayoutInflater.inflate(R.layout.pager_item, container, false);
+        View itemView = mLayoutInflater.inflate(R.layout.pager_item_photo, container, false);
 
         ImageView imageView = (ImageView) itemView.findViewById(R.id.photoView);
         Picasso.with(context).load(GalImages.get(position)).into(imageView);

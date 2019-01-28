@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.heapixLearn.discovery.NewsManager;
+import com.heapixLearn.discovery.help.NewsManager;
 import com.heapixLearn.discovery.R;
 
 public class NewsFragment extends Fragment {
@@ -31,6 +31,7 @@ public class NewsFragment extends Fragment {
         NewsAdapter adapter = new NewsAdapter(newsManager.getAll(), getContext());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter.notifyDataSetChanged();
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 }
