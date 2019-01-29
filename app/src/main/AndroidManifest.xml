@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.heapixLearn.discovery">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -14,9 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
-        <activity android:name=".ui.full_screen_media_display.FullScreenPhoto"></activity>
-        <activity android:name=".ui.full_screen_media_display.FullScreenVideo"></activity>
+        <activity android:name=".ui.full_screen_media_display.FullScreenPhoto" />
+        <activity android:name=".ui.full_screen_media_display.FullScreenVideo" />
     </application>
 
 </manifest>
