@@ -3,7 +3,7 @@ package com.heapixLearn.discovery;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class User {
+public class Person {
     @SerializedName("id")
     @Expose
     private String id;

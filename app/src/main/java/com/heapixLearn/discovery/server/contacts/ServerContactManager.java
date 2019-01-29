@@ -20,19 +20,18 @@ public class ServerContactManager {
     private AuthStore authStore;
 
     public ServerContactManager(){
-        userApi = Controller.getApi();
-        authStore = AuthStore.getInstance();
+        authStore = new AuthStore();
+        userApi = Controller.getApi(authStore.getToken());
     }
 
     public void readContacts(final RunnableWithObject<List<ServerContact>> onSuccess, final RunnableWithObject<TypeOfServerError> onFailure){
-        userApi.readContacts(authStore.getToken()).enqueue(new Callback<List<ServerContact>>() {
+        userApi.readContacts().enqueue(new Callback<List<ServerContact>>() {
             @Override
             public void onResponse(Call<List<ServerContact>> call, Response<List<ServerContact>> response) {
-                if (isExist(response.body())){
+                check_error(response.code(), onFailure);
+                if (response.body()!=null){
                     onSuccess.init(response.body());
-                } else {
-                    onFailure.init(TypeOfServerError.SERVER_ERROR);
-                    onFailure.run();
+                    onSuccess.run();
                 }
             }
 
@@ -44,16 +43,15 @@ public class ServerContactManager {
         });
     }
 
-    public void createContact(ServerContact serverContact, final Runnable onSuccess, final RunnableWithObject<TypeOfServerError> onFailure){
-        userApi.createContact(serverContact, authStore.getToken()).enqueue(new Callback<ServerContact>() {
+    public void createContact(ServerContact serverContact, final RunnableWithObject<ServerContact> onSuccess, final RunnableWithObject<TypeOfServerError> onFailure){
+        userApi.createContact(serverContact).enqueue(new Callback<ServerContact>() {
             @Override
             public void onResponse(Call<ServerContact> call, Response<ServerContact> response) {
-                if (isExist(response.body())){
+                check_error(response.code(), onFailure);
+
+                if (response.body()!=null){
+                    onSuccess.init(response.body());
                     onSuccess.run();
-                }
-                else {
-                    onFailure.init(TypeOfServerError.SERVER_ERROR);
-                    onFailure.run();
                 }
             }
 
@@ -66,23 +64,23 @@ public class ServerContactManager {
     }
 
     public void updateContact(ServerContact serverContact, Runnable onSuccess, RunnableWithObject<TypeOfServerError> onFailure){
-        getServerAnswerFromServer(userApi.updateContact(serverContact.getId(), serverContact, authStore.getToken()), onSuccess, onFailure);
+        getServerAnswerFromServer(userApi.updateContact(serverContact.getId(), serverContact), onSuccess, onFailure);
     }
 
     public void deleteContact(ServerContact serverContact, Runnable onSuccess, RunnableWithObject<TypeOfServerError> onFailure){
-        getServerAnswerFromServer(userApi.deleteContact(serverContact.getId(), authStore.getToken()), onSuccess, onFailure);
+        getServerAnswerFromServer(userApi.deleteContact(serverContact.getId()), onSuccess, onFailure);
     }
 
     public void getContactById(String id, final RunnableWithObject<ServerContact> onSuccess, final RunnableWithObject<TypeOfServerError> onFailure){
-        userApi.getContactById(id, authStore.getToken()).enqueue(new Callback<ServerContact>() {
+        userApi.getContactById(id).enqueue(new Callback<ServerContact>() {
             @Override
             public void onResponse(Call<ServerContact> call, Response<ServerContact> response) {
-                if (isExist(response.body())){
+
+                check_error(response.code(), onFailure);
+
+                if (response.body()!=null) {
                     onSuccess.init(response.body());
                     onSuccess.run();
-                } else {
-                    onFailure.init(TypeOfServerError.SERVER_ERROR);
-                    onFailure.run();
                 }
             }
 
@@ -98,12 +96,10 @@ public class ServerContactManager {
         call.enqueue(new Callback<ServerAnswer>() {
             @Override
             public void onResponse(Call<ServerAnswer> call, Response<ServerAnswer> response) {
-                if (isExist(response.body())) {
-                    onSuccess.run();
+                check_error(response.code(), onFailure);
 
-                } else {
-                    onFailure.init(TypeOfServerError.SERVER_ERROR);
-                    onFailure.run();
+                if (response.body()!=null) {
+                    onSuccess.run();
                 }
             }
 
@@ -115,16 +111,21 @@ public class ServerContactManager {
         });
     }
 
-    private boolean isExist(ServerContact body){
-        return body!=null;
-    }
-
-    private boolean isExist(ServerAnswer body){
-        return body!=null;
-    }
-
-    private boolean isExist(List<ServerContact> body){
-        return body!=null;
+    private void check_error(int code, RunnableWithObject<TypeOfServerError> onFailure){
+        switch (code){
+            case 404:
+                onFailure.init(TypeOfServerError.INFO_IS_ABSENT);
+                onFailure.run();
+                return;
+            case 401:
+                onFailure.init(TypeOfServerError.WRONG_CREDENTIALS);
+                onFailure.run();
+                return;
+        }
+        if (code/100==5){
+            onFailure.init(TypeOfServerError.SERVER_ERROR);
+            onFailure.run();
+        }
     }
 
 }

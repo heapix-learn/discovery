@@ -13,12 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".AppContext">
-        <activity android:name="com.heapixLearn.discovery.MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+
     </application>
 
 </manifest>
