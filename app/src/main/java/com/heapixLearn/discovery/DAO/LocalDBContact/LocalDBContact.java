@@ -7,7 +7,9 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity(tableName = "contacts")
 public class LocalDBContact {
 
-    public LocalDBContact(String name, String nick, String email, String phone, int remoteID, byte[] avatar, boolean isFriend) {
+    public LocalDBContact(
+            String name, String nick, String email, String phone,
+            int remoteID, byte[] avatar, boolean isFriend) {
         this.name = name;
         this.nick = nick;
         this.email = email;
