@@ -5,9 +5,9 @@ import com.heapixLearn.discovery.logic.contact.LogicContact;
 import java.util.ArrayList;
 
 public interface DBStoreContactManager {
-    Void create(LogicContact data);
-    Void update(LogicContact data);
-    Void delete(LogicContact data);
+    void create(LogicContact data);
+    void update(LogicContact data);
+    void delete(LogicContact data);
     LogicContact getById(LogicContact data);
     ArrayList<LogicContact> getAll();
     void onContactCreated(LogicContact contact);

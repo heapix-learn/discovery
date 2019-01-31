@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public interface ServerStoreContactManager {
     LogicContact create(LogicContact data);
     LogicContact update(LogicContact data);
-    Boolean delete(LogicContact data);
+    boolean delete(LogicContact data);
     LogicContact getById(LogicContact data);
     ArrayList<LogicContact> getAll();
 }

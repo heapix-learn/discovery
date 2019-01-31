@@ -7,6 +7,5 @@ public interface DBStoreContact {
     String getPhone();
     String getAvatar();
     String getEmail();
-    Boolean isFriend();
-    int getRemoteId();
+    boolean isFriend();
 }

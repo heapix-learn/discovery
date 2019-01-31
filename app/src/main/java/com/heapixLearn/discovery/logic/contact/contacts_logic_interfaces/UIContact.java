@@ -7,6 +7,6 @@ public interface UIContact {
     String getPhone();
     String getAvatar();
     String getEmail();
-    Boolean isFriend();
+    boolean isFriend();
     int getRemoteId();
 }
