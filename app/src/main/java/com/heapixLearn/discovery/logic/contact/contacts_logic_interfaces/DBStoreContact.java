@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces;
+package com.heapixLearn.discovery.logic.contact.contacts_logic_interfaces;
 
 public interface DBStoreContact {
     int getId();

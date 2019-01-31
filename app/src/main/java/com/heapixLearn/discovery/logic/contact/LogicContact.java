@@ -1,13 +1,9 @@
 package com.heapixLearn.discovery.logic.contact;
 
-import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.DBStoreContact;
-import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.ServerStoreContact;
-import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.UIContact;
+import com.heapixLearn.discovery.logic.contact.contacts_logic_interfaces.DBStoreContact;
 
 public class LogicContact {
     DBStoreContact dbContact;
-    ServerStoreContact serverContact;
-    UIContact uiContact;
 
     public LogicContact(DBStoreContact dbContact) {
         this.dbContact = dbContact;
@@ -44,12 +40,28 @@ public class LogicContact {
     }
 
 
-    public Boolean isFriend() {
+    public boolean isFriend() {
         return dbContact.isFriend();
     }
 
 
-    public int getRemoteId() {
-        return 0;
+    @Override
+    public boolean equals(Object obj) {
+        LogicContact contactToCompare = (LogicContact) obj;
+        if ((getId() == contactToCompare.getId()) &&
+                (getName().equals(contactToCompare.getName())) &&
+                (getNick().equals(contactToCompare.getNick())) &&
+                (getPhone().equals(contactToCompare.getPhone())) &&
+                (getAvatar().equals(contactToCompare.getAvatar())) &&
+                (getEmail().equals(contactToCompare.getEmail())) &&
+                (isFriend() == contactToCompare.isFriend())
+        ) {
+            return true;
+        }
+
+        if (this == obj) {
+            return true;
+        }
+        return false;
     }
 }

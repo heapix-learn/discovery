@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces;
+package com.heapixLearn.discovery.logic.contact.contacts_logic_interfaces;
 
 import com.heapixLearn.discovery.logic.contact.LogicContact;
 
@@ -9,8 +9,6 @@ public interface DBStoreContactManager {
     void update(LogicContact data);
     void delete(LogicContact data);
     LogicContact getById(LogicContact data);
-    ArrayList<LogicContact> getAll();
-    void onContactCreated(LogicContact contact);
-    void omContactDeleted(LogicContact contact);
-    void onContactUpdated(LogicContact contact);
+    ArrayList<LogicContact> getFollowings();
+    void deleteAllExceptFollowings();
 }

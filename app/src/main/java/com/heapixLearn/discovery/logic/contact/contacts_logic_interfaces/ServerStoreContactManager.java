@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces;
+package com.heapixLearn.discovery.logic.contact.contacts_logic_interfaces;
 
 import com.heapixLearn.discovery.logic.contact.LogicContact;
 
@@ -8,6 +8,6 @@ public interface ServerStoreContactManager {
     LogicContact create(LogicContact data);
     LogicContact update(LogicContact data);
     boolean delete(LogicContact data);
-    LogicContact getById(LogicContact data);
     ArrayList<LogicContact> getAll();
+    ArrayList<LogicContact> getFollowings(int id);
 }

@@ -1,31 +1,30 @@
 package com.heapixLearn.discovery.logic.contact;
 
+import android.annotation.SuppressLint;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.DBStoreContactManager;
-import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.ServerStoreContactManager;
-import com.heapixLearn.discovery.logic.contact.contacts_domain_interfaces.UIContactManager;
+import com.heapixLearn.discovery.logic.contact.contacts_logic_interfaces.AuthStore;
+import com.heapixLearn.discovery.logic.contact.contacts_logic_interfaces.DBStoreContactManager;
+import com.heapixLearn.discovery.logic.contact.contacts_logic_interfaces.ServerStoreContactManager;
+import com.heapixLearn.discovery.logic.contact.contacts_logic_interfaces.UIContactManager;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class LogicContactManager {
     private static String TAG = "!!!LOG!!!";
+
     static LogicContactManager instance;
+    AuthStore store = null;
     DBStoreContactManager dbManager;
     ServerStoreContactManager serverManager;
     UIContactManager uiManager;
 
-
-    private LogicContactManager(DBStoreContactManager dbManager, ServerStoreContactManager serverManager, UIContactManager uiManager) {
-        this.dbManager = dbManager;
-        this.serverManager = serverManager;
-        this.uiManager = uiManager;
-    }
-
-    public LogicContactManager getInstance(DBStoreContactManager dbManager, ServerStoreContactManager serverManager, UIContactManager uiManager) {
+    public static LogicContactManager getInstance() {
         if (instance == null) {
-            instance = new LogicContactManager(dbManager, serverManager, uiManager);
+            instance = new LogicContactManager();
         }
         return instance;
     }
@@ -81,23 +80,108 @@ public class LogicContactManager {
     }
 
 
-    public ArrayList<LogicContact> getAll() {
-        return dbManager.getAll();
+    @SuppressLint("StaticFieldLeak")
+    public ArrayList<LogicContact> getAll(Runnable onSuccess, Runnable onFail) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        ArrayList<LogicContact> users = null;
+
+        try {
+            users = new AsyncTask<Void, Void, ArrayList<LogicContact>>() {
+                @Override
+                protected ArrayList<LogicContact> doInBackground(Void... voids) {
+                    if (serverManager.getAll() == null) {
+                        handler.post(onFail);
+                    } else {
+                        handler.post(onSuccess);
+                        return serverManager.getAll();
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(ArrayList<LogicContact> users) {
+                    super.onPostExecute(users);
+                }
+            }.execute().get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return users;
     }
 
 
-    public void onServerContactCreated(LogicContact contact) {
-            dbManager.onContactCreated(contact);
-            uiManager.onContactCreated(contact);
+    /***
+     *
+     * @param onSuccess
+     * @param onFail
+     * @return User followings
+     *
+     * Get followings from local DB and display it.
+     * Then Run new Thread.
+     * There we get following list from server.
+     * If null is returned -> some kind of error has occurred and onFail() run in UI.
+     * Else onSuccess() run in UI and if we have some change on server(for eg your following delete his account),
+     * local db updated and UI gets the command to update.
+     *
+     */
+    public ArrayList<LogicContact> getFollowings(Runnable onSuccess, Runnable onFail) {
+        int userId = store.getContact().getId();
+        ArrayList<LogicContact> followingsFromDB = new ArrayList(dbManager.getFollowings());
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        Runnable runnable = () -> {
+            ArrayList<LogicContact> followingsFromServer = serverManager.getFollowings(userId);
+
+            if (followingsFromServer == null) {
+                handler.post(onFail);
+            } else {
+                handler.post(onSuccess);
+
+                for (LogicContact contact : followingsFromServer) {
+                    if (!followingsFromDB.contains(contact)) {
+                        onServerContactDeleted(contact);
+                    }
+
+                    if (!(contact.equals(dbManager.getById(contact)))) {
+                        onServerContactUpdated(contact);
+                    }
+                }
+            }
+        };
+        new Thread(runnable).start();
+        return followingsFromDB;
     }
 
-    public void onServerContactDelete(LogicContact contact) {
-        dbManager.omContactDeleted(contact);
+
+    /***
+     *
+     * @param contacts
+     *
+     * Every time new posts are loaded into the local db,
+     * this method triggers and the owners of the old posts are deleted from db,
+     * the users who own new posts are loaded into db.
+     */
+    public void onNewPostSaved(ArrayList<LogicContact> contacts) {
+        Runnable runnable = () -> {
+            dbManager.deleteAllExceptFollowings();
+            for (LogicContact contact : contacts) {
+                dbManager.create(contact);
+            }
+        };
+        new Thread(runnable).start();
+    }
+
+
+
+    public void onServerContactDeleted(LogicContact contact) {
+        dbManager.create(contact);
         uiManager.onContactDeleted(contact);
     }
 
     public void onServerContactUpdated(LogicContact contact) {
-        dbManager.onContactUpdated(contact);
+        dbManager.create(contact);
         uiManager.onContactUpdated(contact);
     }
 }
