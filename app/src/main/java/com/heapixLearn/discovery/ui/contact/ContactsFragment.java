@@ -26,7 +26,7 @@ public class ContactsFragment extends Fragment implements SearchView.OnQueryText
     View contactsFragment;
     private ArrayList<Contact> contacts = new ArrayList<>();
     //TODO init manager
-    private ContactManager contactManager = new com.heapixLearn.discovery.ContactManager();
+    private ContactManager contactManager = new com.heapixLearn.discovery.logic.contact.ContactManager();
     ContactListAdapter adapter;
 
     @Nullable

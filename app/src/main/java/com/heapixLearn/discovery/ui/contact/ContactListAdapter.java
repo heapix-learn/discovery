@@ -22,7 +22,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
     private ArrayList<Contact> list = new ArrayList<>();
     private Context context;
     //TODO init manager
-    private ContactManager contactManager = new com.heapixLearn.discovery.ContactManager();
+    private ContactManager contactManager = new com.heapixLearn.discovery.logic.contact.ContactManager();
     Contact item;
 
     public ContactListAdapter(ArrayList<Contact> list, Context context) {
@@ -95,11 +95,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             public void onClick(View v) {
                 if(contactManager != null){
                     item = list.get(i);
-                    if(item.isFriend()){
-                        contactManager.update(item, onSuccess, onFailure);
-                    } else {
-                        contactManager.update(item, onSuccess, onFailure);
-                    }
+                    contactManager.update(item, onSuccess, onFailure);
                 } else {
                     Toast.makeText(context, context.getString(R.string.unable_to_update_data),
                             Toast.LENGTH_SHORT).show();

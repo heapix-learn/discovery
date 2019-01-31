@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery;
+package com.heapixLearn.discovery.logic.contact;
 
 import com.heapixLearn.discovery.ui.contact.Contact;
 
