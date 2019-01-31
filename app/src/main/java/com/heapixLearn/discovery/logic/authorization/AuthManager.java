@@ -4,11 +4,13 @@ package com.heapixLearn.discovery.logic.authorization;
 import com.facebook.Profile;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.gson.Gson;
-import com.heapixLearn.discovery.User;
+import com.heapixLearn.discovery.entity.authorization.Email;
+import com.heapixLearn.discovery.entity.authorization.Person;
 import com.heapixLearn.discovery.db.authorization.AuthStore;
-import com.heapixLearn.discovery.server.Controller;
-import com.heapixLearn.discovery.server.ServerAnswer;
-import com.heapixLearn.discovery.server.UserApi;
+import com.heapixLearn.discovery.entity.authorization.Phone;
+import com.heapixLearn.discovery.server.authorization.Controller;
+import com.heapixLearn.discovery.server.authorization.ServerAnswer;
+import com.heapixLearn.discovery.server.authorization.AuthApi;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -16,23 +18,16 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class AuthManager implements AuthManagerInterface {
+public class AuthManager implements AuthManagerWith {
 
     private AuthorizationErrors.TypeOfAuthManagerError error;
     private AuthStore store;
-    private static AuthManager instance;
-    private final UserApi userApi;
-    private VerificationData verificationData;
+    private AuthApi authApi;
+    private String verificationToken;
 
-    private AuthManager(){
-        store = AuthStore.getInstance();
-        userApi = Controller.getApi();
-        verificationData =new VerificationData();
-    }
-
-    public static AuthManager getInstance(){
-        if (instance==null) instance = new AuthManager();
-        return instance;
+    public AuthManager(){
+        store = new AuthStore();
+        authApi = Controller.getApi();
     }
 
     @Override
@@ -45,15 +40,15 @@ public class AuthManager implements AuthManagerInterface {
             }
         };
 
-        AuthUserInfo authUserInfo = new AuthUserInfo();
-        authUserInfo.setLogin(login);
-        authUserInfo.setPassword(password);
+        AuthInfo authInfo = new AuthInfo();
+        authInfo.setLogin(login);
+        authInfo.setPassword(password);
 
-        userApi.checkLogin(authUserInfo).enqueue(new Callback<ServerAnswer>() {
+        authApi.checkLogin(authInfo).enqueue(new Callback<ServerAnswer>() {
             @Override
             public void onResponse(Call<ServerAnswer> call, final Response<ServerAnswer> response) {
 
-                if (!isExist(response.body())) {
+                if (response.errorBody()!=null) {
                     Gson gson = new Gson();
                     ServerAnswer serverAnswer=gson.fromJson(response.errorBody().charStream(),ServerAnswer.class);
                     error = AuthorizationErrors.convertError(serverAnswer.getError());
@@ -83,10 +78,10 @@ public class AuthManager implements AuthManagerInterface {
     @Override
     public void tryLoginWithGoogle(final GoogleSignInAccount account, final Runnable onSuccess, final RunnableWithError onFailure) {
         this.error = null;
-        userApi.signInWithGoogle(account).enqueue(new Callback<ServerAnswer>() {
+        authApi.signInWithGoogle(account).enqueue(new Callback<ServerAnswer>() {
             @Override
             public void onResponse(Call<ServerAnswer> call, Response<ServerAnswer> response) {
-                if (isExist(response.body())){
+                if (response.body()!=null){
                     if (response.body().getSuccess() && (response.body().getToken()!=null)){
                         store.saveLogin(account.getEmail());
                         store.saveToken(response.body().getToken());
@@ -106,10 +101,10 @@ public class AuthManager implements AuthManagerInterface {
     @Override
     public void tryLoginWithFacebook(final Profile account, final Runnable onSuccess, final RunnableWithError onFailure) {
         this.error = null;
-        userApi.signInWithFacebook(account).enqueue(new Callback<ServerAnswer>() {
+        authApi.signInWithFacebook(account).enqueue(new Callback<ServerAnswer>() {
             @Override
             public void onResponse(Call<ServerAnswer> call, Response<ServerAnswer> response) {
-                if (isExist(response.body())){
+                if (response.body()!=null){
                     if (response.body().getSuccess() && (response.body().getToken()!=null)){
                         store.saveLogin(account.getName());
                         store.saveToken(response.body().getToken());
@@ -133,10 +128,10 @@ public class AuthManager implements AuthManagerInterface {
     }
 
     private void tryLoginWithToken(String token, final Runnable onSuccess, final Runnable onFailure){
-        userApi.getUser(token).enqueue(new Callback<User>() {
+        authApi.getPerson(token).enqueue(new Callback<Person>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                if (isExist(response.body())){
+            public void onResponse(Call<Person> call, Response<Person> response) {
+                if (response.body()!=null){
                     onSuccess.run();
                 }
                 else{
@@ -145,14 +140,14 @@ public class AuthManager implements AuthManagerInterface {
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(Call<Person> call, Throwable t) {
                 onFailure.run();
             }
         });
     }
 
     @Override
-    public void tryRegistrationWith(User myUser, final Runnable onSuccess, final RunnableWithError onFailure) {
+    public void tryRegistrationWith(Person myPerson, final Runnable onSuccess, final RunnableWithError onFailure) {
         final Runnable onFailureUserCheck = new Runnable() {
             @Override
             public void run() {
@@ -161,7 +156,7 @@ public class AuthManager implements AuthManagerInterface {
             }
         };
 
-        userApi.SignUp(myUser).enqueue(new Callback<ResponseBody>() {
+        authApi.SignUp(myPerson).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, final Response<ResponseBody> response) {
                 if (response.errorBody()!=null) {
@@ -190,14 +185,14 @@ public class AuthManager implements AuthManagerInterface {
             onFailure.run();
         }
 
-        User user = new User();
-        user.setEmail(email);
-        userApi.checkEmail(user).enqueue(new Callback<ServerAnswer>() {
+        Email emailObject = new Email();
+        emailObject.setEmail(email);
+        authApi.checkEmail(emailObject).enqueue(new Callback<ServerAnswer>() {
             @Override
             public void onResponse(Call<ServerAnswer> call, Response<ServerAnswer> response) {
-                if (isExist(response.body())){
+                if (response.body()!=null){
                     if (response.body().getSuccess() && (response.body().getToken()!=null)){
-                        verificationData.setToken(response.body().getToken());
+                        verificationToken = response.body().getToken();
                         onSuccess.run();
                     }
                     else onFailure.run();
@@ -215,16 +210,18 @@ public class AuthManager implements AuthManagerInterface {
 
     @Override
     public void checkEmailVerification(final Runnable onSuccess, final RunnableWithError onFailure) {
-        userApi.checkVerification(verificationData).enqueue(new Callback<ServerAnswer>() {
+        authApi.checkVerification(verificationToken).enqueue(new Callback<ServerAnswer>() {
             @Override
             public void onResponse(Call<ServerAnswer> call, Response<ServerAnswer> response) {
                 if (response.body()!=null){
                     if (response.body().getSuccess()){
                         onSuccess.run();
+                    } else {
+                        onFailure.run();
                     }
-                    else onFailure.run();
+                } else {
+                    onFailure.run();
                 }
-                else onFailure.run();
             }
 
             @Override
@@ -243,14 +240,14 @@ public class AuthManager implements AuthManagerInterface {
 
     @Override
     public void sendSMSToPhone(String phone, final Runnable onSuccess, final RunnableWithError onFailure) {
-        User user = new User();
-        user.setPhone(phone);
-        userApi.checkPhone(user).enqueue(new Callback<ServerAnswer>() {
+        Phone phoneObject = new Phone();
+        phoneObject.setPhone(phone);
+        authApi.checkPhone(phoneObject).enqueue(new Callback<ServerAnswer>() {
             @Override
             public void onResponse(Call<ServerAnswer> call, Response<ServerAnswer> response) {
-                if (isExist(response.body())){
+                if (response.body()!=null){
                     if (response.body().getSuccess() && (response.body().getToken()!=null)){
-                        verificationData.setToken(response.body().getToken());
+                        verificationToken = response.body().getToken();
                         onSuccess.run();
                     }else onFailure.run();
                 }
@@ -266,11 +263,12 @@ public class AuthManager implements AuthManagerInterface {
 
     @Override
     public void checkPhoneVerification(String code, final Runnable onSuccess, final RunnableWithError onFailure) {
-        verificationData.setCode(code);
-        userApi.checkVerification(verificationData).enqueue(new Callback<ServerAnswer>() {
+        VerificationCode verificationCode = new VerificationCode();
+        verificationCode.setCode(code);
+        authApi.checkVerification(verificationCode, verificationToken).enqueue(new Callback<ServerAnswer>() {
             @Override
             public void onResponse(Call<ServerAnswer> call, Response<ServerAnswer> response) {
-                if (isExist(response.body())){
+                if (response.body()!=null){
                     if (response.body().getSuccess()){
                         onSuccess.run();
                     }
@@ -289,9 +287,9 @@ public class AuthManager implements AuthManagerInterface {
 
     @Override
     public void forgotPassword(String login, final Runnable onSuccess, final RunnableWithError onFailure) {
-        AuthUserInfo authUserInfo = new AuthUserInfo();
-        authUserInfo.setLogin(login);
-        userApi.forgotPassword(authUserInfo).enqueue(new Callback<ServerAnswer>() {
+        AuthInfo authInfo = new AuthInfo();
+        authInfo.setLogin(login);
+        authApi.forgotPassword(authInfo).enqueue(new Callback<ServerAnswer>() {
             @Override
             public void onResponse(Call<ServerAnswer> call, Response<ServerAnswer> response) {
                 if (response.body()!=null){
@@ -316,27 +314,20 @@ public class AuthManager implements AuthManagerInterface {
     }
 
     private void saveUser(){
-        userApi.getUser(store.getToken()).enqueue(new Callback<User>() {
+        authApi.getPerson(store.getToken()).enqueue(new Callback<Person>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                if (isExist(response.body())){
-                    store.saveUser(response.body());
+            public void onResponse(Call<Person> call, Response<Person> response) {
+                if (response.body()!=null){
+                    store.savePerson(response.body());
                 }
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(Call<Person> call, Throwable t) {
 
             }
         });
     }
 
-    private boolean isExist(User user){
-        return user!=null;
-    }
-
-    private boolean isExist(ServerAnswer serverAnswer){
-        return serverAnswer!=null;
-    }
 
 }

@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.heapixLearn.discovery.MainActivity;
 import com.heapixLearn.discovery.R;
 
 public class SuccessRegistrationActivity extends AppCompatActivity {

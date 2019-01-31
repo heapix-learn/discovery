@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.heapixLearn.discovery.AppContext;
+import com.heapixLearn.discovery.App;
 import com.heapixLearn.discovery.MainActivity;
 import com.heapixLearn.discovery.R;
 import com.heapixLearn.discovery.ui.authorization.LoginActivity;
@@ -34,6 +34,6 @@ public class StartActivity extends AppCompatActivity {
             }
         };
 
-        AppContext.checkAuthorization(onSuccess, onFailure);
+        App.checkAuthorization(onSuccess, onFailure);
     }
 }

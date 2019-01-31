@@ -36,12 +36,12 @@
     <string name="google_key">AIzaSyD0t_n5ImwxZ0OYkRKY4lTLBDr3MzzYDXY</string>
 
 
-    <string name="text_success_reg1">Welcom to Discover, </string>
-    <string name="text_success_reg2">You can post photos, videos and your text in places on the map. You can change your nickname at any time.</string>
-    <string name="text_success_reg3">By registering, you accept our</string>
-    <string name="text_success_reg4">Terms, the Data Use Policy and the Cookie Policy.</string>
-    <string name="add_profile">Add profile photo</string>
-    <string name="add_a_profi">Add a profile photo so your friends can recognize you.</string>
-    <string name="photo">PHOTO</string>
-    <string name="skip">Skip</string>
+    <string name="text_success_reg1">Добро пожаловать в Discover, </string>
+    <string name="text_success_reg2">Вы можете размещать фотографии, видео и текст в местах на карте. Вы можете изменить свой ник в любое время.</string>
+    <string name="text_success_reg3">Регистрируясь, вы принимаете наши</string>
+    <string name="text_success_reg4">Условия, Политика использования данных и Политика использования файлов cookie.</string>
+    <string name="add_profile">Добавить фото профиля</string>
+    <string name="add_a_profi">Добавьте фотографию профиля, чтобы ваши друзья могли вас узнать.</string>
+    <string name="photo">ФОТО</string>
+    <string name="skip">Пропустить</string>
 </resources>

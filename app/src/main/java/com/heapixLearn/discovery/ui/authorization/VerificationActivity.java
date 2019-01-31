@@ -10,11 +10,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.heapixLearn.discovery.MainActivity;
 import com.heapixLearn.discovery.R;
-import com.heapixLearn.discovery.User;
+import com.heapixLearn.discovery.entity.authorization.Person;
 import com.heapixLearn.discovery.logic.authorization.AuthManager;
-import com.heapixLearn.discovery.logic.authorization.AuthManagerInterface;
+import com.heapixLearn.discovery.logic.authorization.AuthManagerWith;
 import com.heapixLearn.discovery.logic.authorization.RunnableWithError;
 
 public class VerificationActivity extends AppCompatActivity {
@@ -48,7 +47,18 @@ public class VerificationActivity extends AppCompatActivity {
             Toast.makeText(VerificationActivity.this, this.getError().getDescription()+"",Toast.LENGTH_SHORT).show();
         }
     };
-    private AuthManagerInterface authManager = AuthManager.getInstance();
+    private AuthManagerWith authManager = new AuthManager();
+
+    final Runnable onSuccessLogin = new Runnable() {
+        @Override
+        public void run() {
+            setResult(RESULT_SUCCESS);
+            Intent intent = new Intent(VerificationActivity.this, SuccessRegistrationActivity.class);
+            intent.putExtra(NICK, nick);
+            startActivity(intent);
+            finish();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,25 +152,16 @@ public class VerificationActivity extends AppCompatActivity {
                 authManager.checkEmailVerification(new Runnable() {
                     @Override
                     public void run() {
-                        User myUser = new User();
-                        myUser.setPassword(password);
-                        myUser.setEmail(email);
-                        myUser.setName(name);
-                        myUser.setUserName(nick);
+                        Person myPerson = new Person();
+                        myPerson.setPassword(password);
+                        myPerson.setEmail(email);
+                        myPerson.setName(name);
+                        myPerson.setUserName(nick);
 
-                        authManager.tryRegistrationWith(myUser, new Runnable() {
+                        authManager.tryRegistrationWith(myPerson, new Runnable() {
                             @Override
                             public void run() {
-                                authManager.tryLoginWith(email, password, new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        setResult(RESULT_SUCCESS);
-                                        Intent intent = new Intent(VerificationActivity.this, SuccessRegistrationActivity.class);
-                                        intent.putExtra(NICK, nick);
-                                        startActivity(intent);
-                                        finish();
-                                    }
-                                }, onFailure);
+                                authManager.tryLoginWith(email, password, onSuccessLogin, onFailure);
                             }
                         }, onFailure);
                     }
@@ -175,25 +176,16 @@ public class VerificationActivity extends AppCompatActivity {
                 authManager.checkPhoneVerification(code, new Runnable() {
                     @Override
                     public void run() {
-                        User myUser = new User();
-                        myUser.setPassword(password);
-                        myUser.setPhone(phone);
-                        myUser.setName(name);
-                        myUser.setUserName(nick);
+                        Person myPerson = new Person();
+                        myPerson.setPassword(password);
+                        myPerson.setPhone(phone);
+                        myPerson.setName(name);
+                        myPerson.setUserName(nick);
 
-                        authManager.tryRegistrationWith(myUser, new Runnable() {
+                        authManager.tryRegistrationWith(myPerson, new Runnable() {
                             @Override
                             public void run() {
-                                authManager.tryLoginWith(phone, password, new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        setResult(RESULT_SUCCESS);
-                                        Intent intent = new Intent(VerificationActivity.this, SuccessRegistrationActivity.class);
-                                        intent.putExtra(NICK, nick);
-                                        startActivity(intent);
-                                        finish();
-                                    }
-                                }, onFailure);
+                                authManager.tryLoginWith(phone, password, onSuccessLogin, onFailure);
                             }
                         }, onFailure);
                     }

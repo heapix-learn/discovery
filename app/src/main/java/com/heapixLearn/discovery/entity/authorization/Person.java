@@ -1,9 +1,9 @@
-package com.heapixLearn.discovery;
+package com.heapixLearn.discovery.entity.authorization;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class User {
+public class Person implements EmailWith, PhoneWith {
     @SerializedName("id")
     @Expose
     private String id;
@@ -14,13 +14,13 @@ public class User {
     @Expose
     private String password;
 
-    @SerializedName("email")
-    @Expose
-    private String email;
-
     @SerializedName("name")
     @Expose
     private String name;
+
+    @SerializedName("email")
+    @Expose
+    private String email;
 
     @SerializedName("phone")
     @Expose
@@ -54,28 +54,12 @@ public class User {
         this.password = password;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 
     public void setAvatarURL(String avatarURL) {
@@ -84,6 +68,26 @@ public class User {
 
     public String getAvatarURL() {
         return avatarURL;
+    }
+
+    @Override
+    public String getEmail() {
+        return email;
+    }
+
+    @Override
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @Override
+    public String getPhone() {
+        return phone;
+    }
+
+    @Override
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }
 

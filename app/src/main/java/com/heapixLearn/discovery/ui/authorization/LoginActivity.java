@@ -29,7 +29,7 @@ import com.google.android.gms.tasks.Task;
 import com.heapixLearn.discovery.MainActivity;
 import com.heapixLearn.discovery.R;
 import com.heapixLearn.discovery.logic.authorization.AuthManager;
-import com.heapixLearn.discovery.logic.authorization.AuthManagerInterface;
+import com.heapixLearn.discovery.logic.authorization.AuthManagerWith;
 import com.heapixLearn.discovery.logic.authorization.RunnableWithError;
 
 public class LoginActivity extends AppCompatActivity {
@@ -42,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
     private AutoCompleteTextView mUserNameView;
     private EditText mPasswordView;
     private CallbackManager callbackManager;
-    private AuthManagerInterface authManager = AuthManager.getInstance();
+    private AuthManagerWith authManager = new AuthManager();
     private Runnable onSuccess = new Runnable() {
     @Override
     public void run() {

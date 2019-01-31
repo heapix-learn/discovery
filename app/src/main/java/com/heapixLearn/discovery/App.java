@@ -1,14 +1,11 @@
 package com.heapixLearn.discovery;
 
-import android.app.Activity;
 import android.app.Application;
 
 import com.heapixLearn.discovery.logic.authorization.AuthManager;
 
-import java.util.concurrent.Semaphore;
-
-public class AppContext extends Application {
-    private static AppContext instance;
+public class App extends Application {
+    private static App instance;
 
 
     @Override
@@ -17,11 +14,11 @@ public class AppContext extends Application {
         instance = this;
     }
 
-    public static AppContext getInstance() {
+    public static App getInstance() {
         return instance;
     }
     public static void checkAuthorization(Runnable onSuccess, Runnable onFailure){
-        AuthManager authManager = AuthManager.getInstance();
+        AuthManager authManager = new AuthManager();
         authManager.tryLoginWithStoredInfo(onSuccess, onFailure);
     }
 

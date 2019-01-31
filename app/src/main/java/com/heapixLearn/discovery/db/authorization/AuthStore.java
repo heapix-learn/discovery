@@ -1,10 +1,9 @@
 package com.heapixLearn.discovery.db.authorization;
 
 import android.content.SharedPreferences;
-
 import com.google.gson.Gson;
-import com.heapixLearn.discovery.AppContext;
-import com.heapixLearn.discovery.User;
+import com.heapixLearn.discovery.App;
+import com.heapixLearn.discovery.entity.authorization.Person;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -15,16 +14,9 @@ public class AuthStore {
     private static final String SAVED_TOKEN = "saved_token";
     private static final String SAVED_USER = "saved_user";
     private SharedPreferences preferences;
-    private static AuthStore instance;
 
-    private AuthStore(){
-        preferences = AppContext.getInstance().getSharedPreferences("MyPrefs", MODE_PRIVATE);
-    }
-    public static AuthStore getInstance(){
-        if (instance ==null){
-            instance = new AuthStore();
-        }
-        return instance;
+    public AuthStore(){
+        preferences = App.getInstance().getSharedPreferences("MyPrefs", MODE_PRIVATE);
     }
 
     public void saveLogin(String login) {
@@ -33,10 +25,10 @@ public class AuthStore {
         editor.apply();
     }
 
-    public void saveUser(User user) {
+    public void savePerson(Person person) {
         SharedPreferences.Editor editor = preferences.edit();
         Gson gson = new Gson();
-        String json = gson.toJson(user);
+        String json = gson.toJson(person);
         editor.putString(SAVED_USER, json);
         editor.apply();
     }
@@ -47,10 +39,10 @@ public class AuthStore {
         editor.apply();
     }
 
-    public User getUser() {
+    public Person getPerson() {
         Gson gson = new Gson();
         String json = preferences.getString(SAVED_USER, "");
-        return gson.fromJson(json, User.class);
+        return gson.fromJson(json, Person.class);
     }
 
     public String getToken() {

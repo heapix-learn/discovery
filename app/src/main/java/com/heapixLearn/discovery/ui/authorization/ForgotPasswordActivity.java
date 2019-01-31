@@ -8,12 +8,12 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.heapixLearn.discovery.logic.authorization.AuthManager;
-import com.heapixLearn.discovery.logic.authorization.AuthManagerInterface;
+import com.heapixLearn.discovery.logic.authorization.AuthManagerWith;
 import com.heapixLearn.discovery.logic.authorization.RunnableWithError;
 import com.heapixLearn.discovery.R;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
-    private AuthManagerInterface authManagerInterface = AuthManager.getInstance();
+    private AuthManagerWith authManagerWith = new AuthManager();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +40,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                         Toast.makeText(ForgotPasswordActivity.this, this.getError().getDescription()+"",Toast.LENGTH_SHORT).show();
                     }
                 };
-                authManagerInterface.forgotPassword(info.getText().toString(), onSuccess, onFailure);
+                authManagerWith.forgotPassword(info.getText().toString(), onSuccess, onFailure);
             }
         });
     }
