@@ -14,5 +14,6 @@
     <string name="followers_1">Подписчик</string>
     <string name="followers_default">Подписчиков</string>
     <string name="no_followers">Нет подписчиков</string>
+    <string name="unable_to_update_data">Невозможно обновить данные</string>
 
 </resources>

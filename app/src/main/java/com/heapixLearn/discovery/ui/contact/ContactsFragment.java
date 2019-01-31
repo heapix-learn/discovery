@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.heapixLearn.discovery.R;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class ContactsFragment extends Fragment implements SearchView.OnQueryText
     View contactsFragment;
     private ArrayList<Contact> contacts = new ArrayList<>();
     //TODO init manager
-    private ContactManager contactManager;
+    private ContactManager contactManager = new com.heapixLearn.discovery.ContactManager();
     ContactListAdapter adapter;
 
     @Nullable
@@ -53,11 +53,16 @@ public class ContactsFragment extends Fragment implements SearchView.OnQueryText
     }
 
     private void initContactRecyclerView(){
-        contacts = contactManager.getAll();
-        adapter = new ContactListAdapter(contacts, getContext());
-        RecyclerView recyclerView = contactsFragment.findViewById(R.id.contact_recycler_view);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        if (contactManager != null) {
+            contacts = contactManager.getAll();
+            adapter = new ContactListAdapter(contacts, getContext());
+            RecyclerView recyclerView = contactsFragment.findViewById(R.id.contact_recycler_view);
+            recyclerView.setAdapter(adapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        } else {
+            Toast.makeText(getContext(), getString(R.string.unable_to_update_data),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

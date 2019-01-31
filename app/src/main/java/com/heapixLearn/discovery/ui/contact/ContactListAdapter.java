@@ -22,26 +22,8 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
     private ArrayList<Contact> list = new ArrayList<>();
     private Context context;
     //TODO init manager
-    private ContactManager contactManager;
+    private ContactManager contactManager = new com.heapixLearn.discovery.ContactManager();
     Contact item;
-
-    private Runnable onSuccess = new Runnable() {
-        @Override
-        public void run() {
-            if(item.isFriend()){
-                Toast.makeText(context, context.getString(R.string.contact_follow), Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(context, context.getString(R.string.contact_unfollow), Toast.LENGTH_SHORT).show();
-            }
-
-        }
-    };
-    private Runnable onFailure = new Runnable() {
-        @Override
-        public void run() {
-            Toast.makeText(context, context.getString(R.string.contact_on_failure), Toast.LENGTH_SHORT).show();
-        }
-    };
 
     public ContactListAdapter(ArrayList<Contact> list, Context context) {
         this.list = list;
@@ -52,7 +34,8 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(context).inflate(R.layout.contact_item, viewGroup, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.contact_item, viewGroup,
+                false);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }
@@ -62,12 +45,35 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         item = list.get(i);
         viewHolder.contactUsername.setText(item.getName());
 
+        final Runnable onSuccess = new Runnable() {
+            @Override
+            public void run() {
+                if(item.isFriend()){
+                    item.setFriend(false);
+                    viewHolder.contactButton.setBackgroundResource(R.drawable.follow);
+                    Toast.makeText(context, context.getString(R.string.contact_unfollow), Toast.LENGTH_SHORT).show();
+                } else {
+                    item.setFriend(true);
+                    viewHolder.contactButton.setBackgroundResource(R.drawable.unfollow);
+                    Toast.makeText(context, context.getString(R.string.contact_follow), Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        };
+        final Runnable onFailure = new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(context, context.getString(R.string.contact_on_failure),
+                        Toast.LENGTH_SHORT).show();
+            }
+        };
+
         if(item.getFollowers() == 0){
             viewHolder.contactFollowers.setText(R.string.no_followers);
-        } else if(item.getFollowers() == 1){
+        } else if(item.getFollowers() % 10 == 1){
             String followersOne = item.getFollowers() + " " + context.getString(R.string.followers_1);
             viewHolder.contactFollowers.setText(followersOne);
-        } else if(item.getFollowers() >= 2 && item.getFollowers() <= 4) {
+        } else if(item.getFollowers() % 10 >= 2 && item.getFollowers() % 10 <= 4) {
             String followersTwoFour = item.getFollowers() + " " + context.getString(R.string.followers_2_4);
             viewHolder.contactFollowers.setText(followersTwoFour);
         } else {
@@ -87,18 +93,43 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         viewHolder.contactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                item = list.get(i);
-                if(item.isFriend()){
-                    item.setFriend(false);
-                    viewHolder.contactButton.setBackgroundResource(R.drawable.follow);
-                    contactManager.update(item, onSuccess, onFailure);
+                if(contactManager != null){
+                    item = list.get(i);
+                    if(item.isFriend()){
+                        contactManager.update(item, onSuccess, onFailure);
+                    } else {
+                        contactManager.update(item, onSuccess, onFailure);
+                    }
                 } else {
-                    item.setFriend(true);
-                    viewHolder.contactButton.setBackgroundResource(R.drawable.unfollow);
-                    contactManager.update(item, onSuccess, onFailure);
+                    Toast.makeText(context, context.getString(R.string.unable_to_update_data),
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    public void updateDataInList(Contact newContact){
+        if (contactManager != null) {
+            int id = newContact.getId();
+            Contact oldContact = contactManager.getById(id);
+            list.remove(oldContact);
+            list.add(newContact);
+            notifyDataSetChanged();
+        } else {
+            Toast.makeText(context, context.getString(R.string.unable_to_update_data),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void deleteDataFromList(int id){
+        if(contactManager != null){
+            Contact deleteContact = contactManager.getById(id);
+            list.remove(deleteContact);
+            notifyDataSetChanged();
+        } else {
+            Toast.makeText(context, context.getString(R.string.unable_to_update_data),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void updateList(ArrayList<Contact> newList){

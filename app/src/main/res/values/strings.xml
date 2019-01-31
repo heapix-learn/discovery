@@ -16,4 +16,5 @@
     <string name="followers_1">Follower</string>
     <string name="followers_default">Followers</string>
     <string name="no_followers">No followers</string>
+    <string name="unable_to_update_data">Unable to update data</string>
 </resources>
