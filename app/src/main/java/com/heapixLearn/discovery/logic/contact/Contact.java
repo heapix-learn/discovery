@@ -8,6 +8,14 @@ public class Contact implements com.heapixLearn.discovery.ui.contact.Contact {
     private String avatar;
     private boolean isFriend;
 
+    public Contact(int id, String name, int followers, String avatar, boolean isFriend) {
+        this.id = id;
+        this.name = name;
+        this.followers = followers;
+        this.avatar = avatar;
+        this.isFriend = isFriend;
+    }
+
     @Override
     public int getId() {
         return id;
