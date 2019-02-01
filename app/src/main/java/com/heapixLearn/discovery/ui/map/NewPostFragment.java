@@ -38,8 +38,6 @@ import java.util.List;
 import static android.app.Activity.RESULT_OK;
 
 public class NewPostFragment extends Fragment {
-
-
     protected EditText textTitle;
     protected EditText textDescription;
     private AutoCompleteTextView textLocation;
@@ -229,25 +227,23 @@ public class NewPostFragment extends Fragment {
         startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
     }
 
-    private void AddLocationForPost(){
-        if (post.getLocation().getLatitude() < -999 && post.getLocation().getLongitude() < -999) {
-            MyLocationListener.SetUpLocationListener(getContext());
-            if (MyLocationListener.imHere==null){
-                Toast.makeText(getContext(), getString(R.string.geolocation_error), Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            post.setLocation(MyLocationListener.imHere.getLatitude(), MyLocationListener.imHere.getLongitude());
-            Geocoder geocoder = new Geocoder(getContext());
-            List<Address> list = new ArrayList<>();
-            try {
-                list = geocoder.getFromLocation(MyLocationListener.imHere.getLatitude(), MyLocationListener.imHere.getLongitude(), 1);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            post.setNameLocation(list.get(0).getLocality());
-            textLocation.setText(post.getNameLocation());
+    private void AddLocationForPost() {
+        MyLocationListener.SetUpLocationListener(getContext());
+        if (MyLocationListener.imHere == null) {
+            Toast.makeText(getContext(), getString(R.string.geolocation_error), Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        post.setLocation(MyLocationListener.imHere.getLatitude(), MyLocationListener.imHere.getLongitude());
+        Geocoder geocoder = new Geocoder(getContext());
+        List<Address> list = new ArrayList<>();
+        try {
+            list = geocoder.getFromLocation(MyLocationListener.imHere.getLatitude(), MyLocationListener.imHere.getLongitude(), 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        post.setNameLocation(list.get(0).getLocality());
+        textLocation.setText(post.getNameLocation());
     }
 
     private AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
@@ -300,8 +296,11 @@ public class NewPostFragment extends Fragment {
         post.setTitle(textTitle.getText().toString());
         post.setDescription(textDescription.getText().toString());
 
-        postManager.addPost(post);
+        if (post.getLocation().getLatitude() < -999 && post.getLocation().getLongitude() < -999) {
+            AddLocationForPost();
+        }
 
+        postManager.addPost(post);
         getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
     }
 
