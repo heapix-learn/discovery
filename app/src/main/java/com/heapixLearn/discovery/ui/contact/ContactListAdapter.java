@@ -106,9 +106,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 
     public void updateDataInList(Contact newContact){
         if (contactManager != null) {
-            int id = newContact.getId();
-            Contact oldContact = contactManager.getById(id);
-            list.remove(oldContact);
+            list.remove(newContact);
             list.add(newContact);
             notifyDataSetChanged();
         } else {
