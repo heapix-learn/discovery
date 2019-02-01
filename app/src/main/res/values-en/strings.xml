@@ -1,5 +1,5 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name" translatable="false">Discover</string>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
     <string name="new_post">New post</string>
     <string name="prompt_title">Title</string>
     <string name="prompt_text">Description</string>
@@ -9,6 +9,5 @@
     <string name="number_of_photo">Number of photo </string>
     <string name="videos">Videos</string>
     <string name="photos">Photos</string>
-    <string name="google_key" tools:ignore="MissingTranslation">AIzaSyD0t_n5ImwxZ0OYkRKY4lTLBDr3MzzYDXY</string>
     <string name="geolocation_error">Enable geolocation resolution in settings</string>
 </resources>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="new_post">Новый пост</string>
+    <string name="prompt_title">Заголовок</string>
+    <string name="prompt_text">Содержание</string>
+    <string name="prompt_location">Локация</string>
+    <string name="add_media">Добавить медиа</string>
+    <string name="number_of_video">Количество видео</string>
+    <string name="number_of_photo">Количество фото</string>
+    <string name="videos">Видео</string>
+    <string name="photos">Фото</string>
+    <string name="geolocation_error">Включите разрешение геолокации в настройках</string>
+</resources>
