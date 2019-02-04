@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 public class NewsItem {
+    private int id;
     private String description;
     private String title;
     private List<String> photos;
@@ -13,6 +14,14 @@ public class NewsItem {
     private Date date;
     private String avatar;
     private String nameOfOwner;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public List<VideoItem> getVideoItems() {
         return videoItems;
@@ -70,4 +79,10 @@ public class NewsItem {
         this.title = title;
     }
 
+    @Override
+    public boolean equals(Object o){
+        if (!(o instanceof NewsItem)) return false;
+        NewsItem document = (NewsItem) o;
+        return id == document.getId();
+    }
 }

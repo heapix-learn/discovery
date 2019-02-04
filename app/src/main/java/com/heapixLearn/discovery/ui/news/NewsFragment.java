@@ -51,8 +51,8 @@ public class NewsFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
-    public void updateNewsItem(NewsItem oldNewsItem, NewsItem newNewsItem){
-        newsItems.remove(oldNewsItem);
+    public void updateNewsItem(NewsItem newNewsItem){
+        newsItems.remove(newNewsItem);
         newsItems.add(newNewsItem);
         adapter.notifyDataSetChanged();
     }
