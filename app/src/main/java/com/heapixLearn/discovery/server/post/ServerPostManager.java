@@ -12,19 +12,39 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PostManager {
+public class ServerPostManager {
     private PostApi postApi;
     private AuthStore authStore;
 
 
-    public PostManager() {
+    public ServerPostManager() {
         authStore = new AuthStore();
-        postApi = com.heapixLearn.discovery.server.post.PostController.getApi(authStore.getToken());
+        postApi = com.heapixLearn.discovery.server.PostController.getApi(authStore.getToken());
     }
 
-    public void readPosts(final RunnableWithObject<List<ServerPost>> onSuccess,
+    public void getNextPost(String id, final RunnableWithObject<ServerPost> onSuccess,
                           final RunnableWithObject<TypeOfServerError> onFailure){
-        postApi.readPosts().enqueue(new Callback<List<ServerPost>>() {
+        postApi.getNextPost(id).enqueue(new Callback<ServerPost>() {
+            @Override
+            public void onResponse(Call<ServerPost> call, Response<ServerPost> response) {
+                check_error(response.code(), onFailure);
+                if (response.body()!=null){
+                    onSuccess.init(response.body());
+                    onSuccess.run();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ServerPost> call, Throwable t) {
+                onFailure.init(TypeOfServerError.INTERNET_DOES_NOT_WORK);
+                onFailure.run();
+            }
+        });
+    }
+
+    public void readPartOfPost(String range, final RunnableWithObject<List<ServerPost>> onSuccess,
+                               final RunnableWithObject<TypeOfServerError> onFailure){
+        postApi.readPartOfPosts(range).enqueue(new Callback<List<ServerPost>>() {
             @Override
             public void onResponse(Call<List<ServerPost>> call, Response<List<ServerPost>> response) {
                 check_error(response.code(), onFailure);

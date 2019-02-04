@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.server.post;
+package com.heapixLearn.discovery.server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

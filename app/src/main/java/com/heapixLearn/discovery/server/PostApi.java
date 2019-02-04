@@ -1,8 +1,5 @@
 package com.heapixLearn.discovery.server;
 
-import android.support.annotation.IntRange;
-
-import com.heapixLearn.discovery.server.ServerAnswer;
 import com.heapixLearn.discovery.server.post.ServerPost;
 
 import java.util.List;
@@ -11,6 +8,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -18,9 +16,12 @@ import retrofit2.http.Path;
 public interface PostApi {
     @POST("/posts")
     Call<ServerPost> createPost(@Body ServerPost post);
-    //TODO : partial
+
+    @GET("/posts/{id}")
+    Call<ServerPost> getNextPost(@Path("id") String id);
+
     @GET("/posts")
-    Call<List<ServerPost>> readPartOfPosts();
+    Call<List<ServerPost>> readPartOfPosts(@Header("Content-Range") String contentRange);
 
     @PATCH("/posts/{id}")
     Call<ServerAnswer> updatePost(@Path("id") String id, @Body ServerPost serverPost);
