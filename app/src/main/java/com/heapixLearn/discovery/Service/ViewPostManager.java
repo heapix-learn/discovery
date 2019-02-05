@@ -147,7 +147,7 @@ public class ViewPostManager {
         return list;
     }
 
-    private void joinAllThreads(){
+    private void joinAllThreads() {
         joinThread(newPostsThread);
         joinThread(updatePostThread);
         joinThread(removePostThread);

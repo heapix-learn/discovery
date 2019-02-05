@@ -1,7 +1,5 @@
 package com.heapixLearn.discovery.Entity;
 
-import android.location.Location;
-
 import java.util.List;
 
 public class ViewablePost implements Comparable<ViewablePost> {
@@ -11,21 +9,25 @@ public class ViewablePost implements Comparable<ViewablePost> {
     private String description;
     private String title;
     private List<String> imgRefList;
-    private List<String> videoRefList;
-    private Location location;
+    private List<VideoItem> videoList;
+    private double lat;
+    private double lng;
 
     private static final int ACCESS_PRIVATE = 0;
     private static final int ACCESS_PUBLIC = 1;
     private static final int ACCESS_GLOBAL = 2;
 
-    public ViewablePost(int access, int userId, String description, String title, List<String> imgRefList, List<String> videoRefList, Location location) {
+    public ViewablePost(
+            int access, int userId, String description, String title,
+            List<String> imgRefList, List<VideoItem> videoList, double lat, double lng) {
         this.access = access;
         this.userId = userId;
         this.description = description;
         this.title = title;
         this.imgRefList = imgRefList;
-        this.videoRefList = videoRefList;
-        this.location = location;
+        this.videoList = videoList;
+        this.lat = lat;
+        this.lng = lng;
     }
 
     @Override
@@ -81,19 +83,27 @@ public class ViewablePost implements Comparable<ViewablePost> {
         this.imgRefList = imgRefList;
     }
 
-    public List<String> getVideoRefList() {
-        return videoRefList;
+    public List<VideoItem> getVideoList() {
+        return videoList;
     }
 
-    public void setVideoRefList(List<String> videoRefList) {
-        this.videoRefList = videoRefList;
+    public void setVideoList(List<VideoItem> videoList) {
+        this.videoList = videoList;
     }
 
-    public Location getLocation() {
-        return location;
+    public double getLat() {
+        return lat;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLng() {
+        return lng;
+    }
+
+    public void setLng(double lng) {
+        this.lng = lng;
     }
 }
