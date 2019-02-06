@@ -66,13 +66,14 @@ public class ViewPostManager {
         return getSubList(amount);
     }
 
-    public ViewablePost getByUserID(int userId) {
+    public List<ViewablePost> getByUserID(int userId) {
+        List<ViewablePost> desiredPosts = serverAdapter.getByUserId(userId);
         for (ViewablePost post : allPosts){
-            if(post.getUserId() == userId){
-                return post;
+            if(post.getUserId() == userId & !desiredPosts.contains(post)){
+                desiredPosts.add(post);
             }
         }
-        return serverAdapter.getByUserId(userId);
+        return desiredPosts;
     }
 
     public void addPost(ViewablePost post, Runnable onSuccess, Runnable onFail) {

@@ -21,7 +21,7 @@ public class ServerPostAdapter implements ServerPostAdapterI {
     }
 
     @Override
-    public ViewablePost getByUserId(int userId){
+    public List<ViewablePost> getByUserId(int userId){
         return null;
     }
 
