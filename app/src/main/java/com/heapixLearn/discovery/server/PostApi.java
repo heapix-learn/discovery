@@ -12,6 +12,7 @@ import retrofit2.http.Header;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface PostApi {
     @POST("/posts")
@@ -20,8 +21,11 @@ public interface PostApi {
     @GET("/posts/{id}")
     Call<ServerPost> getNextPost(@Path("id") String id);
 
+    @GET("/posts/{id}")
+    Call<List<ServerPost>> getPostsByUserId(@Query("id") String id);
+
     @GET("/posts")
-    Call<List<ServerPost>> readPartOfPosts(@Header("Content-Range") String contentRange);
+    Call<List<ServerPost>> getPartOfPosts(@Header("Content-Range") String contentRange);
 
     @PATCH("/posts/{id}")
     Call<ServerAnswer> updatePost(@Path("id") String id, @Body ServerPost serverPost);

@@ -42,9 +42,29 @@ public class ServerPostManager {
         });
     }
 
-    public void readPartOfPost(String range, final RunnableWithObject<List<ServerPost>> onSuccess,
+    public void getPostsByUserId(String id, final RunnableWithObject<List<ServerPost>> onSuccess,
                                final RunnableWithObject<TypeOfServerError> onFailure){
-        postApi.readPartOfPosts(range).enqueue(new Callback<List<ServerPost>>() {
+        postApi.getPostsByUserId(id).enqueue(new Callback<List<ServerPost>>() {
+            @Override
+            public void onResponse(Call<List<ServerPost>> call, Response<List<ServerPost>> response) {
+                check_error(response.code(), onFailure);
+                if (response.body()!=null){
+                    onSuccess.init(response.body());
+                    onSuccess.run();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<ServerPost>> call, Throwable t) {
+                onFailure.init(TypeOfServerError.INTERNET_DOES_NOT_WORK);
+                onFailure.run();
+            }
+        });
+    }
+
+    public void getPartOfPost(String range, final RunnableWithObject<List<ServerPost>> onSuccess,
+                               final RunnableWithObject<TypeOfServerError> onFailure){
+        postApi.getPartOfPosts(range).enqueue(new Callback<List<ServerPost>>() {
             @Override
             public void onResponse(Call<List<ServerPost>> call, Response<List<ServerPost>> response) {
                 check_error(response.code(), onFailure);
