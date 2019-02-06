@@ -66,6 +66,15 @@ public class ViewPostManager {
         return getSubList(amount);
     }
 
+    public ViewablePost getByUserID(int userId) {
+        for (ViewablePost post : allPosts){
+            if(post.getUserId() == userId){
+                return post;
+            }
+        }
+        return serverAdapter.getByUserId(userId);
+    }
+
     public void addPost(ViewablePost post, Runnable onSuccess, Runnable onFail) {
         Runnable runnable = () -> {
             Handler handler = new Handler(Looper.getMainLooper());

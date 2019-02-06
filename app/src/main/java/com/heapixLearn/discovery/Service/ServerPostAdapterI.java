@@ -9,6 +9,7 @@ public interface ServerPostAdapterI {
     List<ViewablePost> getFirst(int amount);
     ViewablePost getNext();
     ViewablePost getById(int id);
+    ViewablePost getByUserId(int userId);
     boolean hasNewPosts();
     ViewablePost insert(ViewablePost post);
     boolean delete(ViewablePost post);

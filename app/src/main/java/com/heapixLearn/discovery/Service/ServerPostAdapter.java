@@ -21,6 +21,11 @@ public class ServerPostAdapter implements ServerPostAdapterI {
     }
 
     @Override
+    public ViewablePost getByUserId(int userId){
+        return null;
+    }
+
+    @Override
     public boolean hasNewPosts() {
         return false;
     }
