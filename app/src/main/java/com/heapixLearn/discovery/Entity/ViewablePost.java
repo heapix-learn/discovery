@@ -12,6 +12,7 @@ public class ViewablePost implements Comparable<ViewablePost> {
     private List<VideoItem> videoList;
     private double lat;
     private double lng;
+    private int date;
 
     private static final int ACCESS_PRIVATE = 0;
     private static final int ACCESS_PUBLIC = 1;
@@ -19,7 +20,7 @@ public class ViewablePost implements Comparable<ViewablePost> {
 
     public ViewablePost(
             int access, int userId, String description, String title,
-            List<String> imgRefList, List<VideoItem> videoList, double lat, double lng) {
+            List<String> imgRefList, List<VideoItem> videoList, double lat, double lng, int date) {
         this.access = access;
         this.userId = userId;
         this.description = description;
@@ -28,11 +29,12 @@ public class ViewablePost implements Comparable<ViewablePost> {
         this.videoList = videoList;
         this.lat = lat;
         this.lng = lng;
+        this.date = date;
     }
 
     @Override
     public int compareTo(ViewablePost o) {
-        return o.getId() - id;
+        return o.getDate() - date;
     }
 
     public int getId() {
@@ -105,5 +107,13 @@ public class ViewablePost implements Comparable<ViewablePost> {
 
     public void setLng(double lng) {
         this.lng = lng;
+    }
+
+    public int getDate() {
+        return date;
+    }
+
+    public void setDate(int date) {
+        this.date = date;
     }
 }

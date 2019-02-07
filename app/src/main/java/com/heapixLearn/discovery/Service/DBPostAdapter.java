@@ -16,8 +16,7 @@ public class DBPostAdapter implements DBPostAdapterI {
     }
 
     @Override
-    public ViewablePost insert(ViewablePost post) {
-        return null;
+    public void insert(ViewablePost post) {
     }
 
     @Override
