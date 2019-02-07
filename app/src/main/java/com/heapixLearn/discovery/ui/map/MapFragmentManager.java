@@ -2,18 +2,19 @@ package com.heapixLearn.discovery.ui.map;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
+import android.widget.Toast;
 
 import com.heapixLearn.discovery.R;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -30,6 +31,7 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillExtrusionHeight;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap;
@@ -38,7 +40,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
-public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListener {
+public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListener, MapboxMap.OnMapClickListener {
     private static MapFragmentManager instance;
     private MapView mapView;
     private List<MapItem> mapItemList;
@@ -53,7 +55,7 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
         this.markerIcon = markerIcon;
 
         mapManager = new MapManager();
-        getMapItemList();
+        getFeatureCollection();
         initMapView();
     }
 
@@ -69,27 +71,50 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
     }
 
     @Override
+    public boolean onMapClick(@NonNull LatLng point) {
+        PointF screenPoint = map.getProjection().toScreenLocation(point);
+        List<Feature> features = map.queryRenderedFeatures(screenPoint, "markers");
+        if (!features.isEmpty()) {
+            Feature selectedFeature = features.get(0);
+            if(selectedFeature.hasProperty("id")) {
+                moveCamera(point, 0);
+                String id = selectedFeature.getStringProperty("id");
+                Toast.makeText(mapView.getContext(), "You selected " + id, Toast.LENGTH_SHORT).show();
+            } else {
+                moveCamera(point, 1);
+            }
+        }
+        return false;
+    }
+
+    private void moveCamera(LatLng latLng, double zoom){
+        CameraPosition.Builder newPosition = new CameraPosition.Builder();
+        if(latLng != null){
+            newPosition.target(latLng);
+        }
+        if(zoom != 0){
+            double currentZoom = map.getCameraPosition().zoom;
+            newPosition.zoom(currentZoom + zoom);
+        }
+        map.animateCamera(CameraUpdateFactory.newCameraPosition(newPosition.build()));
+    }
+
+    @Override
     public void onClick(View v) {
-        double currentZoom = map.getCameraPosition().zoom;
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.zoom_in_button:
-                map.animateCamera(CameraUpdateFactory.newCameraPosition(
-                        new CameraPosition.Builder().zoom(currentZoom + 1).build()));
+                moveCamera(null, 1);
                 break;
             case R.id.zoom_out_button:
-                map.animateCamera(CameraUpdateFactory.newCameraPosition(
-                        new CameraPosition.Builder().zoom(currentZoom - 1).build()));
+                moveCamera(null, -1);
                 break;
         }
     }
 
-    private void getMapItemList() {
-        featureThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mapItemList = mapManager.getAllMapItems();
-                getFeatureCollection();
-            }
+    private void getFeatureCollection() {
+        featureThread = new Thread(() -> {
+            mapItemList = mapManager.getAllMapItems();
+            featureCollection = FeatureCollection.fromFeatures(getFeatureList());
         });
         featureThread.start();
     }
@@ -102,18 +127,14 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         map = mapboxMap;
         setStyle();
+        map.addOnMapClickListener(this);
     }
 
     private void setStyle() {
-        map.setStyle(Style.DARK, new Style.OnStyleLoaded() {
-            @Override
-            public void onStyleLoaded(@NonNull Style style) {
-                style.addImage("marker_icon", markerIcon);
-                addSource(style);
-                addBaseLayer(style);
-                addClusterLayer(style);
-                addCountLayer(style);
-            }
+        map.setStyle(Style.DARK, style -> {
+            style.addImage("marker_icon", markerIcon);
+            addSource(style);
+            addClusterLayer(style);
         });
     }
 
@@ -127,23 +148,16 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
         ));
     }
 
-    private void getFeatureCollection() {
-        featureCollection = FeatureCollection.fromFeatures(getFeatureList());
-    }
-
-    private void addBaseLayer(Style style) {
-        style.addLayer(new SymbolLayer("marker-layer", "marker-source")
-                .withProperties(
-                        iconImage("marker_icon"),
-                        iconSize(7f)
-                ));
-    }
-
     private void addClusterLayer(Style style) {
-        style.addLayer(new SymbolLayer("cluster", "marker-source")
+        style.addLayer(new SymbolLayer("markers", "marker-source")
                 .withProperties(
                         iconImage("marker_icon"),
-                        iconSize(getCircleRadius())
+                        iconSize(getCircleRadius()),
+                        textField(Expression.toString(get("point_count"))),
+                        textSize(11f),
+                        textColor(Color.BLACK),
+                        textIgnorePlacement(true),
+                        textAllowOverlap(true)
                 ));
     }
 
@@ -160,21 +174,12 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
         );
     }
 
-    private void addCountLayer(Style style) {
-        SymbolLayer layer = new SymbolLayer("count", "marker-source").withProperties(
-                textField(Expression.toString(get("point_count"))),
-                textSize(11f),
-                textColor(Color.BLACK),
-                textIgnorePlacement(true),
-                textAllowOverlap(true));
-        style.addLayer(layer);
-    }
-
     private List<Feature> getFeatureList() {
         List<Feature> featureList = new ArrayList<>();
         for (MapItem item : mapItemList) {
             Point point = Point.fromLngLat(item.getLng(), item.getLat());
             Feature feature = Feature.fromGeometry(point);
+            feature.addStringProperty("id", item.getId() + "");
             featureList.add(feature);
         }
         return featureList;
