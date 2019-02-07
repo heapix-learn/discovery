@@ -1,25 +1,24 @@
 package com.heapixLearn.discovery.ui.map;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 
 import com.heapixLearn.discovery.R;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdate;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
-import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -29,56 +28,59 @@ import java.util.List;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.gt;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.gte;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.has;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.log2;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.lt;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleBlur;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleOpacity;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAnchor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textTranslate;
 
-public class MapFragmentManager implements OnMapReadyCallback {
+public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListener {
+    private static MapFragmentManager instance;
     private MapView mapView;
-    private Context context;
     private List<MapItem> mapItemList;
+    private Bitmap markerIcon;
     private MapManager mapManager;
     private MapboxMap map;
     private Thread featureThread;
     private FeatureCollection featureCollection;
 
-    private static MapFragmentManager instance;
+    private MapFragmentManager(MapView mapView, Bitmap markerIcon) {
+        this.mapView = mapView;
+        this.markerIcon = markerIcon;
+
+        mapManager = new MapManager();
+        getMapItemList();
+        initMapView();
+    }
 
     public static synchronized MapFragmentManager getInstance() {
         return instance;
     }
 
-    public static synchronized MapFragmentManager getInstance(Context context) {
+    public static synchronized MapFragmentManager getInstance(MapView mapView, Bitmap markerIcon) {
         if (instance == null) {
-            instance = new MapFragmentManager(context);
+            instance = new MapFragmentManager(mapView, markerIcon);
         }
         return instance;
     }
 
-    private MapFragmentManager(Context context) {
-        this.context = context;
-
-        mapManager = new MapManager();
-        getMapItemList();
-        initMapView();
+    @Override
+    public void onClick(View v) {
+        double currentZoom = map.getCameraPosition().zoom;
+        switch (v.getId()){
+            case R.id.zoom_in_button:
+                map.animateCamera(CameraUpdateFactory.newCameraPosition(
+                        new CameraPosition.Builder().zoom(currentZoom + 1).build()));
+                break;
+            case R.id.zoom_out_button:
+                map.animateCamera(CameraUpdateFactory.newCameraPosition(
+                        new CameraPosition.Builder().zoom(currentZoom - 1).build()));
+                break;
+        }
     }
 
     private void getMapItemList() {
@@ -93,17 +95,20 @@ public class MapFragmentManager implements OnMapReadyCallback {
     }
 
     private void initMapView() {
-        mapView = new MapView(context);
-        mapView.onCreate(null);
         mapView.getMapAsync(this);
     }
 
     @Override
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
-        mapboxMap.setStyle(Style.DARK, new Style.OnStyleLoaded() {
+        map = mapboxMap;
+        setStyle();
+    }
+
+    private void setStyle() {
+        map.setStyle(Style.DARK, new Style.OnStyleLoaded() {
             @Override
             public void onStyleLoaded(@NonNull Style style) {
-                style.addImage("marker_icon", getBitmap());
+                style.addImage("marker_icon", markerIcon);
                 addSource(style);
                 addBaseLayer(style);
                 addClusterLayer(style);
@@ -112,27 +117,17 @@ public class MapFragmentManager implements OnMapReadyCallback {
         });
     }
 
-    private Bitmap getBitmap() {
-        Drawable drawable = context.getResources().getDrawable(R.drawable.map_marker);
-        Canvas canvas = new Canvas();
-        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        canvas.setBitmap(bitmap);
-        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-        drawable.draw(canvas);
-        return bitmap;
-    }
-
     private void addSource(Style style) {
         joinThread(featureThread);
         style.addSource(new GeoJsonSource("marker-source", featureCollection,
                 new GeoJsonOptions()
                         .withCluster(true)
                         .withClusterMaxZoom(14)
-                        .withClusterRadius(100)
+                        .withClusterRadius(60)
         ));
     }
 
-    private void getFeatureCollection(){
+    private void getFeatureCollection() {
         featureCollection = FeatureCollection.fromFeatures(getFeatureList());
     }
 
@@ -156,9 +151,9 @@ public class MapFragmentManager implements OnMapReadyCallback {
         return interpolate(exponential(1.0f), get("point_count"),
                 stop(0, 0f),
                 stop(1, 1.6f),
-                stop(100, 2f),
+                stop(100, 2.5f),
                 stop(500, 3f),
-                stop(1000, 4f),
+                stop(1000, 4.5f),
                 stop(10000, 6f),
                 stop(100000, 8f),
                 stop(1000000, 9f)
@@ -190,10 +185,6 @@ public class MapFragmentManager implements OnMapReadyCallback {
             thread.join();
         } catch (InterruptedException e) {
         }
-    }
-
-    public View getMapView() {
-        return mapView;
     }
 
     public void onResume() {
