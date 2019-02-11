@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Discovery</string>
+    <string name="open_in_maps">Open in maps</string>
 </resources>
