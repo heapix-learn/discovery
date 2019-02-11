@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,8 @@ public class MapFragment extends Fragment {
     private MapView mapView;
     private ImageButton zoomInButton;
     private ImageButton zoomOutButton;
+    private FloatingActionButton addPostButton;
+    private FloatingActionButton postListButton;
 
     @Nullable
     @Override
@@ -39,11 +42,15 @@ public class MapFragment extends Fragment {
         mapView = rootView.findViewById(R.id.mapView);
         zoomInButton = rootView.findViewById(R.id.zoom_in_button);
         zoomOutButton = rootView.findViewById(R.id.zoom_out_button);
+        addPostButton = rootView.findViewById(R.id.map_add_button);
+        postListButton = rootView.findViewById(R.id.map_list_button);
     }
 
     private void setOnClickListeners(){
         zoomInButton.setOnClickListener(mapFragmentManager);
         zoomOutButton.setOnClickListener(mapFragmentManager);
+        addPostButton.setOnClickListener(mapFragmentManager);
+        postListButton.setOnClickListener(mapFragmentManager);
     }
 
     private Bitmap getMarkerIcon() {

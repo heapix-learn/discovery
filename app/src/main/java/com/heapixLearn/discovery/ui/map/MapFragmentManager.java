@@ -27,11 +27,14 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.has;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.lte;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillExtrusionHeight;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap;
@@ -49,6 +52,10 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
     private MapboxMap map;
     private Thread featureThread;
     private FeatureCollection featureCollection;
+    private SymbolLayer baseLayer;
+    private Style style;
+    private byte access = 3;
+    private Expression filter = eq(has("access"), lte(get("access"), access));
 
     private MapFragmentManager(MapView mapView, Bitmap markerIcon) {
         this.mapView = mapView;
@@ -76,10 +83,10 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
         List<Feature> features = map.queryRenderedFeatures(screenPoint, "markers");
         if (!features.isEmpty()) {
             Feature selectedFeature = features.get(0);
-            if(selectedFeature.hasProperty("id")) {
+            if (selectedFeature.hasProperty("id")) {
                 moveCamera(point, 0);
-                String id = selectedFeature.getStringProperty("id");
-                Toast.makeText(mapView.getContext(), "You selected " + id, Toast.LENGTH_SHORT).show();
+                String id = selectedFeature.getStringProperty("access");
+                Toast.makeText(mapView.getContext(), id, Toast.LENGTH_SHORT).show();
             } else {
                 moveCamera(point, 1);
             }
@@ -87,12 +94,12 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
         return false;
     }
 
-    private void moveCamera(LatLng latLng, double zoom){
+    private void moveCamera(LatLng latLng, double zoom) {
         CameraPosition.Builder newPosition = new CameraPosition.Builder();
-        if(latLng != null){
+        if (latLng != null) {
             newPosition.target(latLng);
         }
-        if(zoom != 0){
+        if (zoom != 0) {
             double currentZoom = map.getCameraPosition().zoom;
             newPosition.zoom(currentZoom + zoom);
         }
@@ -108,7 +115,25 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
             case R.id.zoom_out_button:
                 moveCamera(null, -1);
                 break;
+            case R.id.map_add_button:
+                if (access > 0) {
+                    access--;
+                    updateLayerFilter();
+                }
+                break;
+            case R.id.map_list_button:
+                if (access < 2) {
+                    access++;
+                    updateLayerFilter();
+                }
+                break;
         }
+    }
+
+    private void updateLayerFilter() {
+        style.removeLayer(baseLayer);
+        baseLayer.withFilter(eq(has("access"), lte(get("access"), access)));
+        style.addLayer(baseLayer);
     }
 
     private void getFeatureCollection() {
@@ -133,12 +158,15 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
     private void setStyle() {
         map.setStyle(Style.DARK, style -> {
             style.addImage("marker_icon", markerIcon);
-            addSource(style);
-            addClusterLayer(style);
+            this.style = style;
+            addSource();
+            addBaseLayer();
+            addClusterLayers();
         });
     }
 
-    private void addSource(Style style) {
+    private void addSource() {
+
         joinThread(featureThread);
         style.addSource(new GeoJsonSource("marker-source", featureCollection,
                 new GeoJsonOptions()
@@ -148,17 +176,31 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
         ));
     }
 
-    private void addClusterLayer(Style style) {
-        style.addLayer(new SymbolLayer("markers", "marker-source")
+    private void addBaseLayer() {
+        baseLayer = new SymbolLayer("markers", "marker-source")
                 .withProperties(
                         iconImage("marker_icon"),
-                        iconSize(getCircleRadius()),
-                        textField(Expression.toString(get("point_count"))),
-                        textSize(11f),
-                        textColor(Color.BLACK),
-                        textIgnorePlacement(true),
-                        textAllowOverlap(true)
-                ));
+                        iconSize(1.6f))
+                .withFilter(eq(has("access"), lte(get("access"), access)));
+        style.addLayer(baseLayer);
+    }
+
+    private void addClusterLayers() {
+        int[] layers = new int[]{1000000, 100000, 10000, 1000, 500, 100, 0};
+
+        for (int i = 0; i < layers.length; i++) {
+            SymbolLayer cluster = new SymbolLayer("cluster-" + i, "marker-source");
+            cluster.withProperties(
+                    iconImage("marker_icon"),
+                    iconSize(getCircleRadius()),
+                    textField(Expression.toString(get("point_count"))),
+                    textSize(11f),
+                    textColor(Color.BLACK),
+                    textIgnorePlacement(true),
+                    textAllowOverlap(true)
+            );
+            style.addLayer(cluster);
+        }
     }
 
     private Expression getCircleRadius() {
@@ -179,6 +221,7 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
         for (MapItem item : mapItemList) {
             Point point = Point.fromLngLat(item.getLng(), item.getLat());
             Feature feature = Feature.fromGeometry(point);
+            feature.addNumberProperty("access", item.getAccess());
             feature.addStringProperty("id", item.getId() + "");
             featureList.add(feature);
         }

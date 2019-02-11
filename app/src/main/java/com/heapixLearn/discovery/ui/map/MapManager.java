@@ -10,14 +10,14 @@ public class MapManager implements MapManagerI {
         for (int i = 0; i < 10000; i++) {
             double lat = -90 + Math.random() * 181;
             double lng = -180 + Math.random() * 361;
-            list.add(new MapItem(i, i, i, lat, lng));
+            list.add(new MapItem(i, i, i, lat, lng, (byte) (Math.random() * 3)));
         }
         return list;
     }
 
     @Override
     public MapItem getMapItemById(int id) {
-        return new MapItem(1, 2, 3, 15, 66);
+        return new MapItem(1, 2, 3, 15, 66, MapItem.ACCESS_GLOBAL);
     }
 
     @Override
@@ -25,3 +25,5 @@ public class MapManager implements MapManagerI {
         return new Post();
     }
 }
+
+
