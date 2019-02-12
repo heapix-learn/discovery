@@ -27,13 +27,9 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.has;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.lte;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
@@ -50,19 +46,23 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
     private Bitmap markerIcon;
     private MapManager mapManager;
     private MapboxMap map;
-    private Thread featureThread;
-    private FeatureCollection featureCollection;
-    private SymbolLayer baseLayer;
+    private Thread globalFeatureThread;
+    private Thread additionalFeatureThread;
+    private FeatureCollection globalFeatureCollection;
+    private FeatureCollection publicFeatureCollection;
+    private FeatureCollection privateFeatureCollection;
+    private SymbolLayer mainLayer;
+    private SymbolLayer globalLayer;
+    private SymbolLayer publicLayer;
+    private SymbolLayer privateLayer;
     private Style style;
-    private byte access = 3;
-    private Expression filter = eq(has("access"), lte(get("access"), access));
+    private int access = 3;
 
     private MapFragmentManager(MapView mapView, Bitmap markerIcon) {
         this.mapView = mapView;
         this.markerIcon = markerIcon;
 
         mapManager = new MapManager();
-        getFeatureCollection();
         initMapView();
     }
 
@@ -77,10 +77,163 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
         return instance;
     }
 
+    private void changeAccess() {
+        style.removeLayer(mainLayer);
+        replaceLayer();
+        style.addLayer(mainLayer);
+    }
+
+    private void setStyle() {
+        map.setStyle(Style.DARK, style -> {
+            style.addImage("marker_icon", markerIcon);
+            this.style = style;
+            initMainLayer();
+            initAdditionalLayers();
+            style.addLayer(mainLayer);
+        });
+    }
+
+    private void initAdditionalLayers() {
+        getAdditionalFeatureCollections();
+        joinThread(additionalFeatureThread);
+        publicLayer = getLayer(publicFeatureCollection, "public");
+        privateLayer = getLayer(privateFeatureCollection, "private");
+    }
+
+    private void addSource(FeatureCollection collection, String name) {
+        joinThread(globalFeatureThread);
+        joinThread(additionalFeatureThread);
+        style.addSource(new GeoJsonSource("source_" + name, collection,
+                new GeoJsonOptions()
+                        .withCluster(true)
+                        .withClusterMaxZoom(14)
+                        .withClusterRadius(60)
+        ));
+    }
+
+    private SymbolLayer getLayer(FeatureCollection collection, String name) {
+        addSource(collection, name);
+        return new SymbolLayer("markers_" + name, "source_" + name)
+                .withProperties(
+                        iconImage("marker_icon"),
+                        iconSize(getCircleRadius()),
+                        textField(Expression.toString(get("point_count"))),
+                        textSize(11f),
+                        textColor(Color.BLACK),
+                        textIgnorePlacement(true),
+                        textAllowOverlap(true));
+    }
+
+    private List<Feature> getFeatureList(int privacy) {
+        List<Feature> featureList = new ArrayList<>();
+        for (MapItem item : mapItemList) {
+            if (item.getAccess() < privacy) {
+                Point point = Point.fromLngLat(item.getLng(), item.getLat());
+                Feature feature = Feature.fromGeometry(point);
+                feature.addNumberProperty("access", item.getAccess());
+                feature.addStringProperty("id", item.getId() + "");
+                featureList.add(feature);
+            }
+        }
+        return featureList;
+    }
+
+    private void getGlobalFeatureCollection() {
+        globalFeatureThread = new Thread(() -> {
+            mapItemList = mapManager.getAllMapItems();
+            globalFeatureCollection = FeatureCollection.fromFeatures(getFeatureList(3));
+        });
+        globalFeatureThread.start();
+    }
+
+    private void getAdditionalFeatureCollections() {
+        joinThread(globalFeatureThread);
+        additionalFeatureThread = new Thread(() -> {
+            publicFeatureCollection = FeatureCollection.fromFeatures(getFeatureList(2));
+            privateFeatureCollection = FeatureCollection.fromFeatures(getFeatureList(1));
+        });
+        additionalFeatureThread.start();
+    }
+
+    private void initMainLayer() {
+        getGlobalFeatureCollection();
+        joinThread(globalFeatureThread);
+        globalLayer = getLayer(globalFeatureCollection, "global");
+        mainLayer = globalLayer;
+    }
+
+    private void replaceLayer() {
+        joinThread(globalFeatureThread);
+        joinThread(additionalFeatureThread);
+        switch (access) {
+            case 3:
+                setMainLayer(globalLayer);
+                break;
+            case 2:
+                setMainLayer(publicLayer);
+                break;
+            case 1:
+                setMainLayer(privateLayer);
+                break;
+        }
+    }
+
+    private void setMainLayer(SymbolLayer layer) {
+        mainLayer = layer;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.zoom_in_button:
+                moveCamera(null, 1);
+                break;
+            case R.id.zoom_out_button:
+                moveCamera(null, -1);
+                break;
+            case R.id.map_add_button:
+                if (access > 1) {
+                    access--;
+                    changeAccess();
+                }
+                break;
+            case R.id.map_list_button:
+                if (access < 3) {
+                    access++;
+                    changeAccess();
+                }
+                break;
+        }
+    }
+
+    private Expression getCircleRadius() {
+        return interpolate(exponential(1.0f), get("point_count"),
+                stop(0, 0f),
+                stop(1, 1.6f),
+                stop(100, 2.5f),
+                stop(500, 3f),
+                stop(1000, 4.5f),
+                stop(10000, 6f),
+                stop(100000, 8f),
+                stop(1000000, 9f)
+        );
+    }
+
+    private void initMapView() {
+        mapView.getMapAsync(this);
+    }
+
+    @Override
+    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+        map = mapboxMap;
+        setStyle();
+        map.addOnMapClickListener(this);
+    }
+
     @Override
     public boolean onMapClick(@NonNull LatLng point) {
         PointF screenPoint = map.getProjection().toScreenLocation(point);
-        List<Feature> features = map.queryRenderedFeatures(screenPoint, "markers");
+        List<Feature> features = map.queryRenderedFeatures(screenPoint, "markers_global", "markers_public", "markers_private");
         if (!features.isEmpty()) {
             Feature selectedFeature = features.get(0);
             if (selectedFeature.hasProperty("id")) {
@@ -106,132 +259,12 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
         map.animateCamera(CameraUpdateFactory.newCameraPosition(newPosition.build()));
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.zoom_in_button:
-                moveCamera(null, 1);
-                break;
-            case R.id.zoom_out_button:
-                moveCamera(null, -1);
-                break;
-            case R.id.map_add_button:
-                if (access > 0) {
-                    access--;
-                    updateLayerFilter();
-                }
-                break;
-            case R.id.map_list_button:
-                if (access < 2) {
-                    access++;
-                    updateLayerFilter();
-                }
-                break;
-        }
-    }
-
-    private void updateLayerFilter() {
-        style.removeLayer(baseLayer);
-        baseLayer.withFilter(eq(has("access"), lte(get("access"), access)));
-        style.addLayer(baseLayer);
-    }
-
-    private void getFeatureCollection() {
-        featureThread = new Thread(() -> {
-            mapItemList = mapManager.getAllMapItems();
-            featureCollection = FeatureCollection.fromFeatures(getFeatureList());
-        });
-        featureThread.start();
-    }
-
-    private void initMapView() {
-        mapView.getMapAsync(this);
-    }
-
-    @Override
-    public void onMapReady(@NonNull MapboxMap mapboxMap) {
-        map = mapboxMap;
-        setStyle();
-        map.addOnMapClickListener(this);
-    }
-
-    private void setStyle() {
-        map.setStyle(Style.DARK, style -> {
-            style.addImage("marker_icon", markerIcon);
-            this.style = style;
-            addSource();
-            addBaseLayer();
-            addClusterLayers();
-        });
-    }
-
-    private void addSource() {
-
-        joinThread(featureThread);
-        style.addSource(new GeoJsonSource("marker-source", featureCollection,
-                new GeoJsonOptions()
-                        .withCluster(true)
-                        .withClusterMaxZoom(14)
-                        .withClusterRadius(60)
-        ));
-    }
-
-    private void addBaseLayer() {
-        baseLayer = new SymbolLayer("markers", "marker-source")
-                .withProperties(
-                        iconImage("marker_icon"),
-                        iconSize(1.6f))
-                .withFilter(eq(has("access"), lte(get("access"), access)));
-        style.addLayer(baseLayer);
-    }
-
-    private void addClusterLayers() {
-        int[] layers = new int[]{1000000, 100000, 10000, 1000, 500, 100, 0};
-
-        for (int i = 0; i < layers.length; i++) {
-            SymbolLayer cluster = new SymbolLayer("cluster-" + i, "marker-source");
-            cluster.withProperties(
-                    iconImage("marker_icon"),
-                    iconSize(getCircleRadius()),
-                    textField(Expression.toString(get("point_count"))),
-                    textSize(11f),
-                    textColor(Color.BLACK),
-                    textIgnorePlacement(true),
-                    textAllowOverlap(true)
-            );
-            style.addLayer(cluster);
-        }
-    }
-
-    private Expression getCircleRadius() {
-        return interpolate(exponential(1.0f), get("point_count"),
-                stop(0, 0f),
-                stop(1, 1.6f),
-                stop(100, 2.5f),
-                stop(500, 3f),
-                stop(1000, 4.5f),
-                stop(10000, 6f),
-                stop(100000, 8f),
-                stop(1000000, 9f)
-        );
-    }
-
-    private List<Feature> getFeatureList() {
-        List<Feature> featureList = new ArrayList<>();
-        for (MapItem item : mapItemList) {
-            Point point = Point.fromLngLat(item.getLng(), item.getLat());
-            Feature feature = Feature.fromGeometry(point);
-            feature.addNumberProperty("access", item.getAccess());
-            feature.addStringProperty("id", item.getId() + "");
-            featureList.add(feature);
-        }
-        return featureList;
-    }
-
     private void joinThread(Thread thread) {
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
+        if (thread != null) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+            }
         }
     }
 
