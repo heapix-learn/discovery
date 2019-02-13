@@ -81,7 +81,7 @@
         android:clickable="true"
         android:textColor="@color/white"
         android:focusable="true"
-        android:text="@string/access_public"
+        android:text="@string/access_global"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
