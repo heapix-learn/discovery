@@ -4,10 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MapManager implements MapManagerI {
+    private static MapManager instance;
+
+    private MapManager() {
+    }
+
+    public static synchronized MapManager getInstance() {
+        if (instance == null) {
+            instance = new MapManager();
+        }
+        return instance;
+    }
+
     @Override
     public List<MapItem> getAllMapItems() {
         ArrayList<MapItem> list = new ArrayList<>();
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 10000; i++) {
             double lat = -90 + Math.random() * 181;
             double lng = -180 + Math.random() * 361;
             list.add(new MapItem(i, i, i, lat, lng, (byte) (Math.random() * 3)));
@@ -23,6 +35,11 @@ public class MapManager implements MapManagerI {
     @Override
     public Post getPostById(int id) {
         return new Post();
+    }
+
+    @Override
+    public MapItem addPost() {
+        return new MapItem(1, 2, 3, 15, 66, MapItem.ACCESS_GLOBAL);
     }
 }
 

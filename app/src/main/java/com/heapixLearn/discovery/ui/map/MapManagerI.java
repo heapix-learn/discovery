@@ -7,4 +7,5 @@ public interface MapManagerI {
     MapItem getMapItemById(int id);
     Post getPostById(int id);
 
+    MapItem addPost();
 }

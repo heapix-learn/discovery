@@ -1,5 +1,6 @@
 package com.heapixLearn.discovery.ui.map;
 
+import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
@@ -13,18 +14,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.heapixLearn.discovery.R;
 import com.mapbox.mapboxsdk.maps.MapView;
 
-public class MapFragment extends Fragment {
-    private ConstraintLayout rootView;
-    private MapFragmentManager mapFragmentManager;
+public class MapFragment extends Fragment implements View.OnClickListener {
     private MapView mapView;
+    private TextView accesView;
+    private MapManager mapManager;
     private ImageButton zoomInButton;
     private ImageButton zoomOutButton;
+    private ConstraintLayout rootView;
     private FloatingActionButton addPostButton;
     private FloatingActionButton postListButton;
+    private MapFragmentManager mapFragmentManager;
 
     @Nullable
     @Override
@@ -32,25 +36,73 @@ public class MapFragment extends Fragment {
         rootView = (ConstraintLayout) inflater.inflate(R.layout.fragment_map, null);
 
         initViewFields();
-        mapFragmentManager = MapFragmentManager.getInstance(mapView, getMarkerIcon());
+        initManagers();
         setOnClickListeners();
 
         return rootView;
     }
 
-    private void initViewFields(){
+    private void initManagers() {
+        mapFragmentManager = MapFragmentManager.getInstance(mapView, getMarkerIcon());
+        mapManager = MapManager.getInstance();
+    }
+
+    private void initViewFields() {
         mapView = rootView.findViewById(R.id.mapView);
         zoomInButton = rootView.findViewById(R.id.zoom_in_button);
         zoomOutButton = rootView.findViewById(R.id.zoom_out_button);
         addPostButton = rootView.findViewById(R.id.map_add_button);
         postListButton = rootView.findViewById(R.id.map_list_button);
+        accesView = rootView.findViewById(R.id.access_text_view);
     }
 
-    private void setOnClickListeners(){
-        zoomInButton.setOnClickListener(mapFragmentManager);
-        zoomOutButton.setOnClickListener(mapFragmentManager);
-        addPostButton.setOnClickListener(mapFragmentManager);
-        postListButton.setOnClickListener(mapFragmentManager);
+    private void setOnClickListeners() {
+        zoomInButton.setOnClickListener(this);
+        zoomOutButton.setOnClickListener(this);
+        addPostButton.setOnClickListener(this);
+        postListButton.setOnClickListener(this);
+        accesView.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.zoom_in_button:
+                mapFragmentManager.moveCamera(null, 1);
+                break;
+            case R.id.zoom_out_button:
+                mapFragmentManager.moveCamera(null, -1);
+                break;
+            case R.id.map_add_button:
+                mapManager.addPost();
+                break;
+            case R.id.map_list_button:
+                break;
+            case R.id.access_text_view:
+                startPrivacySettingsDialog();
+                break;
+        }
+    }
+
+    private void startPrivacySettingsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setItems(R.array.privacy_settings, (dialog, which) -> {
+            switch (which) {
+                case 0:
+                    mapFragmentManager.changeAccess(3);
+                    accesView.setText(R.string.access_global);
+                    break;
+                case 1:
+                    mapFragmentManager.changeAccess(2);
+                    accesView.setText(R.string.access_public);
+                    break;
+                case 2:
+                    mapFragmentManager.changeAccess(1);
+                    accesView.setText(R.string.access_private);
+                    break;
+            }
+        });
+        builder.show();
     }
 
     private Bitmap getMarkerIcon() {

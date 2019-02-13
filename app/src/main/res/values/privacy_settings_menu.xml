@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="privacy_settings">
+        <item>@string/access_global</item>
+        <item>@string/access_public</item>
+        <item>@string/access_private</item>
+    </array>
+</resources>

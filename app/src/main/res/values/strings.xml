@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Discover</string>
+    <string name="access_public">public</string>
+    <string name="access_private">private</string>
+    <string name="access_global">global</string>
 
     <string name="mapbox_access_token">pk.eyJ1Ijoic2Nyb2xsZW5kIiwiYSI6ImNqcmowN2UzZDA2dW0zenB0OXVsb3c2ZjcifQ.r3rlgnXfXF5srh0NrEO3wA</string>
 </resources>

@@ -5,10 +5,8 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.view.View;
 import android.widget.Toast;
 
-import com.heapixLearn.discovery.R;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
@@ -39,7 +37,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
-public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListener, MapboxMap.OnMapClickListener {
+public class MapFragmentManager implements OnMapReadyCallback, MapboxMap.OnMapClickListener {
     private static MapFragmentManager instance;
     private MapView mapView;
     private List<MapItem> mapItemList;
@@ -62,7 +60,7 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
         this.mapView = mapView;
         this.markerIcon = markerIcon;
 
-        mapManager = new MapManager();
+        mapManager = MapManager.getInstance();
         initMapView();
     }
 
@@ -77,10 +75,13 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
         return instance;
     }
 
-    private void changeAccess() {
-        style.removeLayer(mainLayer);
-        replaceLayer();
-        style.addLayer(mainLayer);
+    public void changeAccess(int newAccess) {
+        if (access != newAccess) {
+            access = newAccess;
+            style.removeLayer(mainLayer);
+            replaceLayer();
+            style.addLayer(mainLayer);
+        }
     }
 
     private void setStyle() {
@@ -178,34 +179,6 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
         }
     }
 
-    private void setMainLayer(SymbolLayer layer) {
-        mainLayer = layer;
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.zoom_in_button:
-                moveCamera(null, 1);
-                break;
-            case R.id.zoom_out_button:
-                moveCamera(null, -1);
-                break;
-            case R.id.map_add_button:
-                if (access > 1) {
-                    access--;
-                    changeAccess();
-                }
-                break;
-            case R.id.map_list_button:
-                if (access < 3) {
-                    access++;
-                    changeAccess();
-                }
-                break;
-        }
-    }
-
     private Expression getCircleRadius() {
         return interpolate(exponential(1.0f), get("point_count"),
                 stop(0, 0f),
@@ -247,7 +220,11 @@ public class MapFragmentManager implements OnMapReadyCallback, View.OnClickListe
         return false;
     }
 
-    private void moveCamera(LatLng latLng, double zoom) {
+    private void setMainLayer(SymbolLayer layer) {
+        mainLayer = layer;
+    }
+
+    public void moveCamera(LatLng latLng, double zoom) {
         CameraPosition.Builder newPosition = new CameraPosition.Builder();
         if (latLng != null) {
             newPosition.target(latLng);
