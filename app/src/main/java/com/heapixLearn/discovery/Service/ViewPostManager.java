@@ -188,7 +188,7 @@ public class ViewPostManager {
 
     private void addPostToDB(ViewablePost post) {
         if (dbList.size() > DB_MAX_AMOUNT) {
-            ViewablePost p = dbList.get(DB_MAX_AMOUNT);
+            ViewablePost p = dbList.get(0);
             dbList.remove(p);
             dbAdapter.delete(p);
         }
