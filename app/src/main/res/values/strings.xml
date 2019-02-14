@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">Discovery</string>
     <string name="open_in_maps">Open in maps</string>
+    <string name="str_likes">Likes</string>
+    <string name="str_comments">Comments</string>
+    <string name="str_followers">Followers</string>
+
+    <string name="contact_follow">Subscription issued</string>
+    <string name="contact_unfollow">Subscription canceled</string>
+
 </resources>
