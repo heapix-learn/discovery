@@ -1,10 +1,10 @@
-package com.heapixLearn.discovery.db;
+package com.heapixLearn.discovery.DAO;
 
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
-import com.heapixLearn.discovery.AppContext;
-import com.heapixLearn.discovery.Person;
+import com.heapixLearn.discovery.App;
+import com.heapixLearn.discovery.server.contacts.Person;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -17,7 +17,7 @@ public class AuthStore {
     private SharedPreferences preferences;
 
     public AuthStore(){
-        preferences = AppContext.getInstance().getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        preferences = App.getInstance().getSharedPreferences("MyPrefs", MODE_PRIVATE);
     }
 
 

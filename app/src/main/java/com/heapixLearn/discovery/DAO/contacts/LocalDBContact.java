@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.DAO.LocalDBContact;
+package com.heapixLearn.discovery.DAO.contacts;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;

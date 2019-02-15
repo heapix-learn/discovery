@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Discovery</string>
+    <string name="app_name" translatable="false">Discover</string>
     <string name="title_activity_main">MainActivity</string>
 
     <string name="title_user">User</string>

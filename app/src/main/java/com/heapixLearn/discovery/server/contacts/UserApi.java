@@ -1,5 +1,6 @@
-package com.heapixLearn.discovery.server;
+package com.heapixLearn.discovery.server.contacts;
 
+import com.heapixLearn.discovery.server.ServerAnswer;
 import com.heapixLearn.discovery.server.contacts.ServerContact;
 
 import java.util.List;

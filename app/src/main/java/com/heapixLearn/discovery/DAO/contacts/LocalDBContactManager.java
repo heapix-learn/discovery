@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.DAO.LocalDBContact;
+package com.heapixLearn.discovery.DAO.contacts;
 
 import com.heapixLearn.discovery.App;
 

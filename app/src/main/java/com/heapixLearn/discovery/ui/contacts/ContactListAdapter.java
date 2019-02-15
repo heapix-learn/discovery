@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.ui.contact;
+package com.heapixLearn.discovery.ui.contacts;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -22,7 +22,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
     private ArrayList<Contact> list = new ArrayList<>();
     private Context context;
     //TODO init manager
-    private ContactManager contactManager = new com.heapixLearn.discovery.logic.contact.ContactManager();
+    private ContactManager contactManager = new com.heapixLearn.discovery.logic.contacts.ContactManager();
     Contact item;
 
     public ContactListAdapter(ArrayList<Contact> list, Context context) {
