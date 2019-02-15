@@ -132,7 +132,7 @@ public class MapFragmentManager implements OnMapReadyCallback, MapboxMap.OnMapCl
                 Point point = Point.fromLngLat(item.getLng(), item.getLat());
                 Feature feature = Feature.fromGeometry(point);
                 feature.addNumberProperty("access", item.getAccess());
-                feature.addStringProperty("id", item.getId() + "");
+                feature.addNumberProperty("id", item.getId());
                 featureList.add(feature);
             }
         }
@@ -211,8 +211,8 @@ public class MapFragmentManager implements OnMapReadyCallback, MapboxMap.OnMapCl
             Feature selectedFeature = features.get(0);
             if (selectedFeature.hasProperty("id")) {
                 moveCamera(point, 0);
-                String id = selectedFeature.getStringProperty("access");
-                Toast.makeText(mapView.getContext(), id, Toast.LENGTH_SHORT).show();
+                int id = (int)selectedFeature.getNumberProperty("id");
+                mapManager.getPostById(id).showPost();
             } else {
                 moveCamera(point, 1);
             }
