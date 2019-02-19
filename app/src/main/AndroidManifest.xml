@@ -14,7 +14,8 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning"
         android:name=".App">
-        <activity android:name="com.heapixLearn.discovery.ui.MainActivity">
+        <activity android:name="com.heapixLearn.discovery.ui.MainActivity"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
