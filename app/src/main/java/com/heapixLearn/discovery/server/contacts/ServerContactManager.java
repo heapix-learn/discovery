@@ -1,12 +1,10 @@
 package com.heapixLearn.discovery.server.contacts;
 
 
-import com.heapixLearn.discovery.db.AuthStore;
+import com.heapixLearn.discovery.DAO.AuthStore;
 import com.heapixLearn.discovery.RunnableWithObject;
-import com.heapixLearn.discovery.server.Controller;
 import com.heapixLearn.discovery.server.ServerAnswer;
 import com.heapixLearn.discovery.server.TypeOfServerError;
-import com.heapixLearn.discovery.server.UserApi;
 
 import java.util.List;
 

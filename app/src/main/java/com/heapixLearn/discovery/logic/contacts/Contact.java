@@ -1,6 +1,6 @@
-package com.heapixLearn.discovery.logic.contact;
+package com.heapixLearn.discovery.logic.contacts;
 
-public class Contact implements com.heapixLearn.discovery.ui.contact.Contact {
+public class Contact implements com.heapixLearn.discovery.ui.contacts.Contact {
 
     private int id;
     private String name;
