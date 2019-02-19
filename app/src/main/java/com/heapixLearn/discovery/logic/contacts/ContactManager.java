@@ -1,10 +1,10 @@
-package com.heapixLearn.discovery.logic.contact;
+package com.heapixLearn.discovery.logic.contacts;
 
-import com.heapixLearn.discovery.ui.contact.Contact;
+import com.heapixLearn.discovery.ui.contacts.Contact;
 
 import java.util.ArrayList;
 
-public class ContactManager implements com.heapixLearn.discovery.ui.contact.ContactManager {
+public class ContactManager implements com.heapixLearn.discovery.ui.contacts.ContactManager {
     @Override
     public void update(Contact data, Runnable onSuccess, Runnable onFailure) {
 

@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.ui.contact;
+package com.heapixLearn.discovery.ui.contacts;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,7 +26,7 @@ public class ContactsFragment extends Fragment implements SearchView.OnQueryText
     View contactsFragment;
     private ArrayList<Contact> contacts = new ArrayList<>();
     //TODO init manager
-    private ContactManager contactManager = new com.heapixLearn.discovery.logic.contact.ContactManager();
+    private ContactManager contactManager = new com.heapixLearn.discovery.logic.contacts.ContactManager();
     ContactListAdapter adapter;
 
     @Nullable

@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery;
+package com.heapixLearn.discovery.ui;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,6 +13,8 @@ import com.heapixLearn.discovery.ui.dummy_fragments.MapFragment;
 import com.heapixLearn.discovery.ui.dummy_fragments.SettingsFragment;
 import com.heapixLearn.discovery.ui.dummy_fragments.SupportFragment;
 import com.heapixLearn.discovery.ui.dummy_fragments.UserProfileFragment;
+
+import com.heapixLearn.discovery.R;
 
 public class MainActivity extends AppCompatActivity {
 

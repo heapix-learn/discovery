@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.ui.contact;
+package com.heapixLearn.discovery.ui.contacts;
 
 import java.util.ArrayList;
 

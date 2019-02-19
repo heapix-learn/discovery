@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.ui.contact;
+package com.heapixLearn.discovery.ui.contacts;
 
 public interface Contact {
     int getId();
