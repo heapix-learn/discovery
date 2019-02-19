@@ -14,14 +14,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.heapixLearn.discovery.R;
 import com.mapbox.mapboxsdk.maps.MapView;
 
+import java.util.List;
+
 public class MapFragment extends Fragment implements View.OnClickListener {
     private MapView mapView;
-    private TextView accesView;
+    private TextView accessView;
     private MapManager mapManager;
     private ImageButton zoomInButton;
     private ImageButton zoomOutButton;
@@ -53,7 +56,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         zoomOutButton = rootView.findViewById(R.id.zoom_out_button);
         addPostButton = rootView.findViewById(R.id.map_add_button);
         postListButton = rootView.findViewById(R.id.map_list_button);
-        accesView = rootView.findViewById(R.id.access_text_view);
+        accessView = rootView.findViewById(R.id.access_text_view);
     }
 
     private void setOnClickListeners() {
@@ -61,7 +64,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         zoomOutButton.setOnClickListener(this);
         addPostButton.setOnClickListener(this);
         postListButton.setOnClickListener(this);
-        accesView.setOnClickListener(this);
+        accessView.setOnClickListener(this);
     }
 
     @Override
@@ -77,11 +80,18 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 mapManager.addPost();
                 break;
             case R.id.map_list_button:
+                startPostListDialog();
                 break;
             case R.id.access_text_view:
                 startPrivacySettingsDialog();
                 break;
         }
+    }
+
+    private void startPostListDialog() {
+        List<Integer> postIds = mapFragmentManager.getPostList();
+        PostListDialog dialog = new PostListDialog(postIds, getContext());
+        dialog.showPostList();
     }
 
     private void startPrivacySettingsDialog() {
@@ -90,15 +100,15 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             switch (which) {
                 case 0:
                     mapFragmentManager.changeAccess(3);
-                    accesView.setText(R.string.access_global);
+                    accessView.setText(R.string.access_global);
                     break;
                 case 1:
                     mapFragmentManager.changeAccess(2);
-                    accesView.setText(R.string.access_public);
+                    accessView.setText(R.string.access_public);
                     break;
                 case 2:
                     mapFragmentManager.changeAccess(1);
-                    accesView.setText(R.string.access_private);
+                    accessView.setText(R.string.access_private);
                     break;
             }
         });

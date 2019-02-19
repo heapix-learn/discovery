@@ -74,15 +74,16 @@
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
         android:background="@drawable/privacy_setting_background"
+        android:clickable="true"
+        android:focusable="true"
         android:paddingStart="16dp"
         android:paddingTop="2dp"
         android:paddingEnd="16dp"
         android:paddingBottom="6dp"
-        android:clickable="true"
-        android:textColor="@color/white"
-        android:focusable="true"
         android:text="@string/access_global"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

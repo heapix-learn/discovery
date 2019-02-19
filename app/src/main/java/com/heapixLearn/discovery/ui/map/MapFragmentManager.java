@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.widget.Toast;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
@@ -13,6 +12,7 @@ import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -46,10 +46,11 @@ public class MapFragmentManager implements OnMapReadyCallback, MapboxMap.OnMapCl
     private MapboxMap map;
     private Thread globalFeatureThread;
     private Thread additionalFeatureThread;
+    private FeatureCollection currentFeatureCollection;
     private FeatureCollection globalFeatureCollection;
     private FeatureCollection publicFeatureCollection;
     private FeatureCollection privateFeatureCollection;
-    private SymbolLayer mainLayer;
+    private SymbolLayer currentLayer;
     private SymbolLayer globalLayer;
     private SymbolLayer publicLayer;
     private SymbolLayer privateLayer;
@@ -78,9 +79,9 @@ public class MapFragmentManager implements OnMapReadyCallback, MapboxMap.OnMapCl
     public void changeAccess(int newAccess) {
         if (access != newAccess) {
             access = newAccess;
-            style.removeLayer(mainLayer);
+            style.removeLayer(currentLayer);
             replaceLayer();
-            style.addLayer(mainLayer);
+            style.addLayer(currentLayer);
         }
     }
 
@@ -90,7 +91,7 @@ public class MapFragmentManager implements OnMapReadyCallback, MapboxMap.OnMapCl
             this.style = style;
             initMainLayer();
             initAdditionalLayers();
-            style.addLayer(mainLayer);
+            style.addLayer(currentLayer);
         });
     }
 
@@ -129,14 +130,23 @@ public class MapFragmentManager implements OnMapReadyCallback, MapboxMap.OnMapCl
         List<Feature> featureList = new ArrayList<>();
         for (MapItem item : mapItemList) {
             if (item.getAccess() < privacy) {
-                Point point = Point.fromLngLat(item.getLng(), item.getLat());
-                Feature feature = Feature.fromGeometry(point);
-                feature.addNumberProperty("access", item.getAccess());
-                feature.addNumberProperty("id", item.getId());
-                featureList.add(feature);
+                featureList.add(makeFeature(item));
             }
         }
         return featureList;
+    }
+
+    private Feature makeFeature(MapItem item) {
+        double lat = item.getLat();
+        double lng = item.getLng();
+
+        Point point = Point.fromLngLat(lng, lat);
+        Feature feature = Feature.fromGeometry(point);
+        feature.addNumberProperty("access", item.getAccess());
+        feature.addNumberProperty("post_id", item.getPostId());
+        feature.addNumberProperty("lat", lat);
+        feature.addNumberProperty("lng", lng);
+        return feature;
     }
 
     private void getGlobalFeatureCollection() {
@@ -160,7 +170,8 @@ public class MapFragmentManager implements OnMapReadyCallback, MapboxMap.OnMapCl
         getGlobalFeatureCollection();
         joinThread(globalFeatureThread);
         globalLayer = getLayer(globalFeatureCollection, "global");
-        mainLayer = globalLayer;
+        currentFeatureCollection = globalFeatureCollection;
+        currentLayer = globalLayer;
     }
 
     private void replaceLayer() {
@@ -168,13 +179,16 @@ public class MapFragmentManager implements OnMapReadyCallback, MapboxMap.OnMapCl
         joinThread(additionalFeatureThread);
         switch (access) {
             case 3:
-                setMainLayer(globalLayer);
+                currentFeatureCollection = globalFeatureCollection;
+                setCurrentLayer(globalLayer);
                 break;
             case 2:
-                setMainLayer(publicLayer);
+                currentFeatureCollection = publicFeatureCollection;
+                setCurrentLayer(publicLayer);
                 break;
             case 1:
-                setMainLayer(privateLayer);
+                currentFeatureCollection = privateFeatureCollection;
+                setCurrentLayer(privateLayer);
                 break;
         }
     }
@@ -206,13 +220,13 @@ public class MapFragmentManager implements OnMapReadyCallback, MapboxMap.OnMapCl
     @Override
     public boolean onMapClick(@NonNull LatLng point) {
         PointF screenPoint = map.getProjection().toScreenLocation(point);
-        List<Feature> features = map.queryRenderedFeatures(screenPoint, "markers_global", "markers_public", "markers_private");
+        List<Feature> features = map.queryRenderedFeatures(screenPoint, currentLayer.getId());
         if (!features.isEmpty()) {
             Feature selectedFeature = features.get(0);
-            if (selectedFeature.hasProperty("id")) {
+            if (selectedFeature.hasProperty("post_id")) {
                 moveCamera(point, 0);
-                int id = (int)selectedFeature.getNumberProperty("id");
-                mapManager.getPostById(id).showPost();
+                int id = (int)((long)selectedFeature.getNumberProperty("post_id"));
+                showPostPreview(id);
             } else {
                 moveCamera(point, 1);
             }
@@ -220,8 +234,28 @@ public class MapFragmentManager implements OnMapReadyCallback, MapboxMap.OnMapCl
         return false;
     }
 
-    private void setMainLayer(SymbolLayer layer) {
-        mainLayer = layer;
+    private void showPostPreview(int id) {
+        PostPreview postPreview = new PostPreview(mapView.getContext());
+        postPreview.showPreview(id);
+    }
+
+    public List<Integer> getPostList() {
+        List<Integer> postIds = new ArrayList<>();
+        LatLngBounds screenBounds = map.getProjection().getVisibleRegion().latLngBounds;
+        List<Feature> currentFeatures = currentFeatureCollection.features();
+        for (Feature feature : currentFeatures) {
+            double lat = (double) feature.getNumberProperty("lat");
+            double lng = (double) feature.getNumberProperty("lng");
+            LatLng latLng = new LatLng(lat, lng);
+            if (screenBounds.contains(latLng)) {
+                postIds.add((int) feature.getNumberProperty("post_id"));
+            }
+        }
+        return postIds;
+    }
+
+    private void setCurrentLayer(SymbolLayer layer) {
+        currentLayer = layer;
     }
 
     public void moveCamera(LatLng latLng, double zoom) {
