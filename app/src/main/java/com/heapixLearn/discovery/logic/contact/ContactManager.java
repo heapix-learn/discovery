@@ -22,6 +22,6 @@ public class ContactManager implements com.heapixLearn.discovery.ui.contact.Cont
 
     @Override
     public ArrayList<Contact> getAll() {
-        return null;
+        return new ArrayList<>();
     }
 }
