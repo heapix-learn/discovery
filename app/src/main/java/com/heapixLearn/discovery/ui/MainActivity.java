@@ -8,7 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import com.heapixLearn.discovery.ui.contact.ContactsFragment;
+import com.heapixLearn.discovery.ui.contacts.ContactsFragment;
 import com.heapixLearn.discovery.ui.dummy_fragments.MapFragment;
 import com.heapixLearn.discovery.ui.dummy_fragments.SettingsFragment;
 import com.heapixLearn.discovery.ui.dummy_fragments.SupportFragment;
