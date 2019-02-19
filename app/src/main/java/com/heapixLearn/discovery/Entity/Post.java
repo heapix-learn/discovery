@@ -2,7 +2,7 @@ package com.heapixLearn.discovery.Entity;
 
 import java.util.List;
 
-public class ViewablePost implements Comparable<ViewablePost> {
+public class Post implements Comparable<Post> {
     private int id;
     private int access;
     private int userId;
@@ -14,11 +14,7 @@ public class ViewablePost implements Comparable<ViewablePost> {
     private double lng;
     private int date;
 
-    private static final int ACCESS_PRIVATE = 0;
-    private static final int ACCESS_PUBLIC = 1;
-    private static final int ACCESS_GLOBAL = 2;
-
-    public ViewablePost(
+    public Post(
             int access, int userId, String description, String title,
             List<String> imgRefList, List<VideoItem> videoList, double lat, double lng, int date) {
         this.access = access;
@@ -33,7 +29,7 @@ public class ViewablePost implements Comparable<ViewablePost> {
     }
 
     @Override
-    public int compareTo(ViewablePost o) {
+    public int compareTo(Post o) {
         return o.getDate() - date;
     }
 
