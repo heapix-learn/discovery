@@ -22,6 +22,26 @@ public class ServerPostManager {
         postApi = com.heapixLearn.discovery.server.PostController.getApi(authStore.getToken());
     }
 
+    public void getPreviousPost(String id, final RunnableWithObject<ServerPost> onSuccess,
+                            final RunnableWithObject<TypeOfServerError> onFailure){
+        postApi.getPreviousPost(id).enqueue(new Callback<ServerPost>() {
+            @Override
+            public void onResponse(Call<ServerPost> call, Response<ServerPost> response) {
+                check_error(response.code(), onFailure);
+                if (response.body()!=null){
+                    onSuccess.init(response.body());
+                    onSuccess.run();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ServerPost> call, Throwable t) {
+                onFailure.init(TypeOfServerError.INTERNET_DOES_NOT_WORK);
+                onFailure.run();
+            }
+        });
+    }
+
     public void getNextPost(String id, final RunnableWithObject<ServerPost> onSuccess,
                           final RunnableWithObject<TypeOfServerError> onFailure){
         postApi.getNextPost(id).enqueue(new Callback<ServerPost>() {
@@ -62,9 +82,9 @@ public class ServerPostManager {
         });
     }
 
-    public void getPartOfPost(String range, final RunnableWithObject<List<ServerPost>> onSuccess,
+    public void getPartOfPost(String range, String id, final RunnableWithObject<List<ServerPost>> onSuccess,
                                final RunnableWithObject<TypeOfServerError> onFailure){
-        postApi.getPartOfPosts(range).enqueue(new Callback<List<ServerPost>>() {
+        postApi.getPartOfPosts(range, id).enqueue(new Callback<List<ServerPost>>() {
             @Override
             public void onResponse(Call<List<ServerPost>> call, Response<List<ServerPost>> response) {
                 check_error(response.code(), onFailure);

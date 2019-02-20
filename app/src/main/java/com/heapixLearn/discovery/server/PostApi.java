@@ -19,13 +19,17 @@ public interface PostApi {
     Call<ServerPost> createPost(@Body ServerPost post);
 
     @GET("/posts/{id}")
+    Call<ServerPost> getPreviousPost(@Path("id") String id);
+
+    @GET("/posts/{id}")
     Call<ServerPost> getNextPost(@Path("id") String id);
 
     @GET("/posts/{id}")
     Call<List<ServerPost>> getPostsByUserId(@Query("id") String id);
 
-    @GET("/posts")
-    Call<List<ServerPost>> getPartOfPosts(@Header("Content-Range") String contentRange);
+    @GET("/posts/{id}")
+    Call<List<ServerPost>> getPartOfPosts(@Header("Content-Range") String contentRange,
+                                          @Path("id") String id);
 
     @PATCH("/posts/{id}")
     Call<ServerAnswer> updatePost(@Path("id") String id, @Body ServerPost serverPost);
