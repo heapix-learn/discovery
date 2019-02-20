@@ -19,7 +19,7 @@ public class UserManager implements IUserManager {
         return null;
     }
 
-    public void init(){
+    private void init(){
         users.add(new User(1, "Viachaslau", "https://pp.userapi.com/c852228/v852228571/7181b/p1f3T3uQ1B8.jpg",
                 120, true, true));
         users.add(new User(2, "Vitaliy", "http://skachat-kartinki.ru/img/picture/Nov/16/fa46483b4e2866d866625ff4d40468ed/mini_1.jpg",

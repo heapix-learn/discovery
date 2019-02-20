@@ -45,6 +45,100 @@ public class PostPreviewFragment extends Fragment implements View.OnClickListene
     IPostManager postManager;
     IUserManager userManager;
 
+    final Runnable onFollowSuccess = new Runnable() {
+        @Override
+        public void run() {
+            if(currentUser.isFriend()){
+                currentUser.setFriend(false);
+                btnFollow.setBackgroundResource(R.drawable.button_follow);
+                Toast.makeText(getContext(), Objects.requireNonNull(getContext())
+                        .getString(R.string.contact_unfollow), Toast.LENGTH_SHORT).show();
+            } else {
+                currentUser.setFriend(true);
+                btnFollow.setBackgroundResource(R.drawable.button_follower);
+                Toast.makeText(getContext(), Objects.requireNonNull(getContext())
+                        .getString(R.string.contact_follow), Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    };
+
+    final Runnable onFollowFailure = new Runnable() {
+        @Override
+        public void run() {
+            Toast.makeText(getContext(), Objects.requireNonNull(getContext())
+                            .getString(R.string.follow_on_failure), Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    final Runnable onLikeSuccess = new Runnable() {
+        @Override
+        public void run() {
+            if(currentUser.isPostLiked(currentPost.getId())){
+                currentUser.setLiked(currentPost.getId(), false);
+                btnLike.setBackgroundResource(R.drawable.button_like);
+                Toast.makeText(getContext(), Objects.requireNonNull(getContext())
+                        .getString(R.string.post_not_liked), Toast.LENGTH_SHORT).show();
+            } else {
+                currentUser.setLiked(currentPost.getId(), true);
+                btnLike.setBackgroundResource(R.drawable.button_liked);
+                Toast.makeText(getContext(), Objects.requireNonNull(getContext())
+                        .getString(R.string.post_liked), Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    };
+
+    final Runnable onLikeFailure = new Runnable() {
+        @Override
+        public void run() {
+            Toast.makeText(getContext(), Objects.requireNonNull(getContext())
+                    .getString(R.string.like_on_failure), Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    final Runnable onFullscreenSuccess = new Runnable() {
+        @Override
+        public void run() {
+            Toast.makeText(getContext(), "Open fullscreen", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    final Runnable onFullscreenFailure = new Runnable() {
+        @Override
+        public void run() {
+            Toast.makeText(getContext(), "Unable to open fullscreen", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    final Runnable onCommentsSuccess = new Runnable() {
+        @Override
+        public void run() {
+            Toast.makeText(getContext(), "Open comments", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    final Runnable onCommentsFailure = new Runnable() {
+        @Override
+        public void run() {
+            Toast.makeText(getContext(), "Unable to open comments", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    final Runnable onMapSuccess = new Runnable() {
+        @Override
+        public void run() {
+            Toast.makeText(getContext(), "Open map", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    final Runnable onMapFailure = new Runnable() {
+        @Override
+        public void run() {
+            Toast.makeText(getContext(), "Unable to open map", Toast.LENGTH_SHORT).show();
+        }
+    };
+
     @SuppressLint("SetTextI18n")
     @Nullable
     @Override
@@ -106,19 +200,39 @@ public class PostPreviewFragment extends Fragment implements View.OnClickListene
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_fullscreen:
-                Toast.makeText(getContext(), "fullscreen", Toast.LENGTH_SHORT).show();
+                postManager.openFullScreen(onFullscreenSuccess, onFullscreenFailure);
                 break;
             case R.id.btn_follow:
-                Toast.makeText(getContext(), "follow", Toast.LENGTH_SHORT).show();
+                if(postManager != null){
+                    postManager.update(currentPost, onFollowSuccess, onFollowFailure);
+                } else {
+                    Toast.makeText(getContext(), Objects.requireNonNull(getContext())
+                                    .getString(R.string.unable_to_update_data), Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.btn_like:
-                Toast.makeText(getContext(), "like", Toast.LENGTH_SHORT).show();
+                if(postManager != null){
+                    postManager.update(currentPost, onLikeSuccess, onLikeFailure);
+                } else {
+                    Toast.makeText(getContext(), Objects.requireNonNull(getContext())
+                            .getString(R.string.unable_to_update_data), Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.btn_comment:
-                Toast.makeText(getContext(), "comment", Toast.LENGTH_SHORT).show();
+                if(postManager != null){
+                    postManager.openComments(onCommentsSuccess, onCommentsFailure);
+                } else {
+                    Toast.makeText(getContext(), Objects.requireNonNull(getContext())
+                            .getString(R.string.unable_to_update_data), Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.tv_open_in_maps:
-                Toast.makeText(getContext(), "open in maps", Toast.LENGTH_SHORT).show();
+                if(postManager != null){
+                    postManager.openInMap(onMapSuccess, onMapFailure);
+                } else {
+                    Toast.makeText(getContext(), Objects.requireNonNull(getContext())
+                            .getString(R.string.unable_to_update_data), Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }

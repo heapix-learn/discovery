@@ -51,7 +51,7 @@ public class User implements IUser {
     }
 
     @Override
-    public void setLiked(boolean liked) {
+    public void setLiked(long postId, boolean liked) {
         isLiked = liked;
     }
 

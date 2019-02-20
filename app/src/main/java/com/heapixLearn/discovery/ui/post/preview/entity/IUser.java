@@ -8,6 +8,6 @@ public interface IUser {
 
     boolean isPostLiked(long postId);
     boolean isFriend();
-    void setLiked(boolean liked);
+    void setLiked(long postId, boolean liked);
     void setFriend(boolean friend);
 }
