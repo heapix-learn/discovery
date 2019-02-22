@@ -1,10 +1,12 @@
 package com.heapixLearn.discovery;
 
 public class RunnableWithObject<T> implements Runnable {
-    T description;
-    public Runnable init(T object){
-        this.description = object;
-        return this;
+    private T object;
+    public void init(T object){
+        this.object = object;
+    }
+    public T getObject() {
+        return object;
     }
 
     @Override

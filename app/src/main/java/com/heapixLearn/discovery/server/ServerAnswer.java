@@ -13,6 +13,10 @@ public class ServerAnswer {
     @Expose
     private String error;
 
+    @SerializedName("has_new_post")
+    @Expose
+    private Boolean hasNewPost;
+
     public String getError() {
         return error;
     }
@@ -35,5 +39,13 @@ public class ServerAnswer {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Boolean getHasNewPost() {
+        return hasNewPost;
+    }
+
+    public void setHasNewPost(Boolean hasNewPost) {
+        this.hasNewPost = hasNewPost;
     }
 }

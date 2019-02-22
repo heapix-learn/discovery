@@ -1,6 +1,6 @@
 package com.heapixLearn.discovery.server;
 
-import com.heapixLearn.discovery.server.post.ServerPost;
+import com.heapixLearn.discovery.server.entity.ServerPost;
 
 import java.util.List;
 
@@ -40,9 +40,6 @@ public interface PostApi {
     @GET("/posts/{id}")
     Call<ServerPost> getPostById(@Path("id") String id);
 
-    @POST("/posts")
-    Call<ServerPost> getNext(@Body ServerPost post);
-
-    @POST("/posts")
-    Call<ServerAnswer> hasNewPost(@Body ServerPost post);
+    @POST("/posts/{id}")
+    Call<ServerAnswer> hasNewPost(@Path("id") String id);
 }

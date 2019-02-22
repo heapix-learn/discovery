@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.server.post;
+package com.heapixLearn.discovery.server.entity;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -30,7 +30,7 @@ public class ServerPost {
 
     @SerializedName("video_ref_list")
     @Expose
-    private String[] video_ref_list;
+    private VideoItem[] video_ref_list;
 
     @SerializedName("date")
     @Expose
@@ -92,11 +92,11 @@ public class ServerPost {
         this.img_ref_list = img_ref_list;
     }
 
-    public String[] getVideo_ref_list() {
+    public VideoItem[] getVideo_ref_list() {
         return video_ref_list;
     }
 
-    public void setVideo_ref_list(String[] video_ref_list) {
+    public void setVideo_ref_list(VideoItem[] video_ref_list) {
         this.video_ref_list = video_ref_list;
     }
 }

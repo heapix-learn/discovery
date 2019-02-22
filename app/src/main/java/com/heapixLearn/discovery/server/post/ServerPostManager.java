@@ -5,6 +5,7 @@ import com.heapixLearn.discovery.db.AuthStore;
 import com.heapixLearn.discovery.server.PostApi;
 import com.heapixLearn.discovery.server.ServerAnswer;
 import com.heapixLearn.discovery.server.TypeOfServerError;
+import com.heapixLearn.discovery.server.entity.ServerPost;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class ServerPostManager {
         postApi.getPreviousPost(id).enqueue(new Callback<ServerPost>() {
             @Override
             public void onResponse(Call<ServerPost> call, Response<ServerPost> response) {
-                check_error(response.code(), onFailure);
+                checkError(response.code(), onFailure);
                 if (response.body()!=null){
                     onSuccess.init(response.body());
                     onSuccess.run();
@@ -47,7 +48,7 @@ public class ServerPostManager {
         postApi.getNextPost(id).enqueue(new Callback<ServerPost>() {
             @Override
             public void onResponse(Call<ServerPost> call, Response<ServerPost> response) {
-                check_error(response.code(), onFailure);
+                checkError(response.code(), onFailure);
                 if (response.body()!=null){
                     onSuccess.init(response.body());
                     onSuccess.run();
@@ -67,7 +68,7 @@ public class ServerPostManager {
         postApi.getPostsByUserId(id).enqueue(new Callback<List<ServerPost>>() {
             @Override
             public void onResponse(Call<List<ServerPost>> call, Response<List<ServerPost>> response) {
-                check_error(response.code(), onFailure);
+                checkError(response.code(), onFailure);
                 if (response.body()!=null){
                     onSuccess.init(response.body());
                     onSuccess.run();
@@ -87,7 +88,7 @@ public class ServerPostManager {
         postApi.getPartOfPosts(range, id).enqueue(new Callback<List<ServerPost>>() {
             @Override
             public void onResponse(Call<List<ServerPost>> call, Response<List<ServerPost>> response) {
-                check_error(response.code(), onFailure);
+                checkError(response.code(), onFailure);
                 if (response.body()!=null){
                     onSuccess.init(response.body());
                     onSuccess.run();
@@ -107,7 +108,7 @@ public class ServerPostManager {
         postApi.createPost(serverPost).enqueue(new Callback<ServerPost>() {
             @Override
             public void onResponse(Call<ServerPost> call, Response<ServerPost> response) {
-                check_error(response.code(), onFailure);
+                checkError(response.code(), onFailure);
 
                 if (response.body()!=null){
                     onSuccess.init(response.body());
@@ -127,11 +128,31 @@ public class ServerPostManager {
         getServerAnswerFromServer(postApi.updatePost(serverPost.getId(), serverPost), onSuccess, onFailure);
     }
 
+    public void hasNewPost(String id, final RunnableWithObject<ServerAnswer> onSuccess,
+                            final RunnableWithObject<TypeOfServerError> onFailure){
+        postApi.hasNewPost(id).enqueue(new Callback<ServerAnswer>() {
+            @Override
+            public void onResponse(Call<ServerAnswer> call, Response<ServerAnswer> response) {
+                checkError(response.code(), onFailure);
+                if (response.body()!=null){
+                    onSuccess.init(response.body());
+                    onSuccess.run();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ServerAnswer> call, Throwable t) {
+                onFailure.init(TypeOfServerError.INTERNET_DOES_NOT_WORK);
+                onFailure.run();
+            }
+        });
+    }
+
     private void getServerAnswerFromServer(Call<ServerAnswer> call, final Runnable onSuccess, final RunnableWithObject<TypeOfServerError> onFailure) {
         call.enqueue(new Callback<ServerAnswer>() {
             @Override
             public void onResponse(Call<ServerAnswer> call, Response<ServerAnswer> response) {
-                check_error(response.code(), onFailure);
+                checkError(response.code(), onFailure);
 
                 if (response.body()!=null) {
                     onSuccess.run();
@@ -156,7 +177,7 @@ public class ServerPostManager {
             @Override
             public void onResponse(Call<ServerPost> call, Response<ServerPost> response) {
 
-                check_error(response.code(), onFailure);
+                checkError(response.code(), onFailure);
 
                 if (response.body()!=null) {
                     onSuccess.init(response.body());
@@ -173,7 +194,7 @@ public class ServerPostManager {
     }
 
 
-    private void check_error(int code, RunnableWithObject<TypeOfServerError> onFailure){
+    private void checkError(int code, RunnableWithObject<TypeOfServerError> onFailure){
         switch (code){
             case 404:
                 onFailure.init(TypeOfServerError.INFO_IS_ABSENT);

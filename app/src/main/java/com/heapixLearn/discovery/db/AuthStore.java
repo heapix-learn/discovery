@@ -4,7 +4,7 @@ import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 import com.heapixLearn.discovery.AppContext;
-import com.heapixLearn.discovery.Person;
+import com.heapixLearn.discovery.server.entity.Person;
 
 import static android.content.Context.MODE_PRIVATE;
 
