@@ -13,4 +13,7 @@
     <string name="post_liked">Post liked</string>
     <string name="post_not_liked">Post not liked</string>
     <string name="like_on_failure">Unable to like</string>
+
+    <string name="photos">Photos</string>
+    <string name="videos">Videos</string>
 </resources>

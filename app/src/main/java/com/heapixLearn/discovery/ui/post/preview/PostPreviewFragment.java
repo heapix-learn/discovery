@@ -191,7 +191,7 @@ public class PostPreviewFragment extends Fragment implements View.OnClickListene
         btnComment.setOnClickListener(this);
         btnOpenInMaps.setOnClickListener(this);
 
-        initPhotoRecyclerView();
+        initPhotosRecyclerView();
 
         return previewFragment;
     }
@@ -237,13 +237,16 @@ public class PostPreviewFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    private void initPhotoRecyclerView(){
+    private void initPhotosRecyclerView(){
         if(postManager != null){
             PostPreviewAdapter adapter = new PostPreviewAdapter(currentPost.getPhotos(), getContext());
-            RecyclerView recyclerView = previewFragment.findViewById(R.id.preview_recycler_view);
+            RecyclerView recyclerView = previewFragment.findViewById(R.id.photos_preview_recycler_view);
             recyclerView.setAdapter(adapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),
                     LinearLayoutManager.HORIZONTAL, false));
         }
+    }
+    private void initVideosRecyclerView(){
+
     }
 }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout android:id="@+id/root"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="100dp"
+    android:layout_height="100dp">
+
+    <ImageView
+        android:id="@+id/video_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/custom_shape_gallery_item"/>
+
+    <ImageButton
+        android:id="@+id/run"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_gravity="center"
+        android:background="@drawable/video_button_play" />
+
+    <TextView
+        android:id="@+id/textTime"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="01:20"
+        android:textColor="@android:color/white"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="5dp"
+        />
+
+</FrameLayout>

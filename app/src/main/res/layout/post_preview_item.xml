@@ -16,11 +16,11 @@
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/share_preview_form"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp">
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/share_preview_form">
 
             <TextView
                 android:id="@+id/preview_location"
@@ -89,20 +89,20 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/textView4"
+                android:id="@+id/tv_photos"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="30dp"
                 android:fontFamily="sans-serif-medium"
-                android:text="Media"
+                android:text="@string/photos"
                 android:textColor="@android:color/black"
                 android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/preview_avatar" />
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/preview_recycler_view"
+                android:id="@+id/photos_preview_recycler_view"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -111,52 +111,75 @@
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView4" />
+                app:layout_constraintTop_toBottomOf="@+id/tv_photos" />
+
+            <TextView
+                android:id="@+id/tv_videos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/videos"
+                android:textColor="@android:color/black"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/photos_preview_recycler_view" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/videos_preview_recycler_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_videos" />
+
+            <TextView
+                android:id="@+id/quantity_likes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="20dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="136 likes"
+                android:textColor="@android:color/black"
+                app:layout_constraintStart_toEndOf="@+id/btn_like"
+                app:layout_constraintTop_toBottomOf="@+id/videos_preview_recycler_view" />
 
             <Button
                 android:id="@+id/btn_like"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="15dp"
                 android:background="@drawable/button_like"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/preview_recycler_view" />
-
-            <TextView
-                android:id="@+id/quantity_likes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="25dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="136 likes"
-                android:textColor="@android:color/black"
-                app:layout_constraintStart_toEndOf="@+id/btn_like"
-                app:layout_constraintTop_toBottomOf="@+id/preview_recycler_view" />
+                app:layout_constraintTop_toBottomOf="@+id/videos_preview_recycler_view" />
 
             <Button
                 android:id="@+id/btn_comment"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginStart="30dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="15dp"
                 android:background="@drawable/button_comment"
                 app:layout_constraintStart_toEndOf="@+id/quantity_likes"
-                app:layout_constraintTop_toBottomOf="@+id/preview_recycler_view" />
+                app:layout_constraintTop_toBottomOf="@+id/videos_preview_recycler_view" />
 
             <TextView
                 android:id="@+id/quantity_comments"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="25dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="20dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="24 comments"
                 android:textColor="@android:color/black"
                 android:textSize="14sp"
                 app:layout_constraintStart_toEndOf="@+id/btn_comment"
-                app:layout_constraintTop_toBottomOf="@+id/preview_recycler_view" />
+                app:layout_constraintTop_toBottomOf="@+id/videos_preview_recycler_view" />
 
             <TextView
                 android:id="@+id/tv_open_in_maps"
@@ -164,13 +187,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="15dp"
-                android:layout_marginBottom="20dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/open_in_maps"
                 android:textColor="@android:color/black"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/btn_like" />
 
