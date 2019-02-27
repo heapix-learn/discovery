@@ -2,6 +2,7 @@ package com.heapixLearn.discovery.ui.post.preview.dummy;
 
 import com.heapixLearn.discovery.ui.post.preview.IPostManager;
 import com.heapixLearn.discovery.ui.post.preview.entity.IPost;
+import com.heapixLearn.discovery.ui.post.preview.entity.VideoItem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +20,7 @@ public class PostManager implements IPostManager {
                         "https://siliconangle.com/files/2013/10/chrome-hacked-story-300x300.jpg",
                         "https://siliconangle.com/files/2013/10/chrome-hacked-story-300x300.jpg"
                 )),
-                new ArrayList<String>(){},
+                new ArrayList<VideoItem>(){},
                 "Soligorsk",
                 150, 25,
                 false, true)

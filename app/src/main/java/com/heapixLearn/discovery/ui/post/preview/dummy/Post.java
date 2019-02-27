@@ -4,6 +4,7 @@ import android.location.Location;
 import android.net.Uri;
 
 import com.heapixLearn.discovery.ui.post.preview.entity.IPost;
+import com.heapixLearn.discovery.ui.post.preview.entity.VideoItem;
 
 import java.util.Date;
 import java.util.List;
@@ -14,14 +15,14 @@ public class Post implements IPost {
     private long accountId;
 
     private List<String> photos;
-    private List<String> videos;
+    private List<VideoItem> videos;
     private String nameLocation;
 
     private int likes;
     private int comments;
 
 
-    public Post(String title, long accountId, List<String> photos, List<String> videos,
+    public Post(String title, long accountId, List<String> photos, List<VideoItem> videos,
                 String nameLocation, int likes, int comments, boolean isLiked, boolean isFollower) {
         this.title = title;
         this.accountId = accountId;
@@ -55,11 +56,11 @@ public class Post implements IPost {
         this.photos = photos;
     }
 
-    public List<String> getVideos() {
+    public List<VideoItem> getVideos() {
         return videos;
     }
 
-    public void setVideos(List<String> videos) {
+    public void setVideos(List<VideoItem> videos) {
         this.videos = videos;
     }
 

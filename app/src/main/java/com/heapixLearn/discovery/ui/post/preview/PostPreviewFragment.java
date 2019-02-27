@@ -1,16 +1,17 @@
 package com.heapixLearn.discovery.ui.post.preview;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,13 +21,23 @@ import com.heapixLearn.discovery.ui.post.preview.dummy.PostManager;
 import com.heapixLearn.discovery.ui.post.preview.dummy.UserManager;
 import com.heapixLearn.discovery.ui.post.preview.entity.IPost;
 import com.heapixLearn.discovery.ui.post.preview.entity.IUser;
+import com.heapixLearn.discovery.ui.post.preview.entity.VideoItem;
+import com.heapixLearn.discovery.ui.post.preview.fullscreen_media.FullscreenPhotoActivity;
+import com.heapixLearn.discovery.ui.post.preview.fullscreen_media.FullscreenVideoActivity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class PostPreviewFragment extends Fragment implements View.OnClickListener {
     View previewFragment;
+
+    private static final String PHOTOS_URL = "photosURL";
+    private static final String POSITION ="position";
+    private static final String VIDEO_URL = "videosURL";
+
 
     CircleImageView avatar;
     TextView username;
@@ -39,6 +50,12 @@ public class PostPreviewFragment extends Fragment implements View.OnClickListene
     TextView btnOpenInMaps;
     TextView quantityLikes;
     TextView quantityComments;
+
+    TableRow photoTableRow;
+    TableRow videoTableRow;
+    LinearLayout photoGallery;
+    LinearLayout videoGallery;
+
 
     IPost currentPost;
     IUser currentUser;
@@ -164,6 +181,11 @@ public class PostPreviewFragment extends Fragment implements View.OnClickListene
         quantityLikes = previewFragment.findViewById(R.id.quantity_likes);
         quantityComments = previewFragment.findViewById(R.id.quantity_comments);
 
+        photoGallery = previewFragment.findViewById(R.id.photo_gallery);
+        photoTableRow = previewFragment.findViewById(R.id.photos_preview_table_row);
+        videoGallery = previewFragment.findViewById(R.id.video_gallery);
+        videoTableRow = previewFragment.findViewById(R.id.videos_preview_table_row);
+
         Glide.with(Objects.requireNonNull(getContext()))
                 .asBitmap()
                 .load(currentUser.getAvatar())
@@ -191,7 +213,8 @@ public class PostPreviewFragment extends Fragment implements View.OnClickListene
         btnComment.setOnClickListener(this);
         btnOpenInMaps.setOnClickListener(this);
 
-        initPhotosRecyclerView();
+        initPhotos();
+        initVideos();
 
         return previewFragment;
     }
@@ -237,16 +260,64 @@ public class PostPreviewFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    private void initPhotosRecyclerView(){
-        if(postManager != null){
-            PostPreviewAdapter adapter = new PostPreviewAdapter(currentPost.getPhotos(), getContext());
-            RecyclerView recyclerView = previewFragment.findViewById(R.id.photos_preview_recycler_view);
-            recyclerView.setAdapter(adapter);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),
-                    LinearLayoutManager.HORIZONTAL, false));
+    private void initPhotos(){
+        if (currentPost.getPhotos().size()>0){
+            photoTableRow.setVisibility(View.VISIBLE);
+            PhotoAdapter photoAdapter = new PhotoAdapter(previewFragment.getContext(),
+                    currentPost.getPhotos());
+            photoGallery.setDividerPadding(5);
+
+            for (int j = 0; j< photoAdapter.getCount(); j++){
+                View add = photoAdapter.getView(j, null, null);
+                add.setId(j);
+                add.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent myIntent = new Intent(previewFragment.getContext(),
+                                FullscreenPhotoActivity.class);
+                        myIntent.putExtra(PHOTOS_URL, (String[]) currentPost.getPhotos()
+                                .toArray(new String[currentPost.getPhotos().size()]));
+                        myIntent.putExtra(POSITION, v.getId());
+                        startActivity(myIntent, null);
+                    }
+                });
+                photoGallery.addView(add);
+            }
         }
     }
-    private void initVideosRecyclerView(){
+    private void initVideos(){
+        if (currentPost.getVideos().size()>0){
+            videoTableRow.setVisibility(View.VISIBLE);
 
+            VideoAdapter videoAdapter = new VideoAdapter(previewFragment.getContext(),
+                    currentPost.getVideos());
+            videoGallery.setDividerPadding(5);
+
+            for (int j = 0; j< videoAdapter.getCount(); j++){
+                View add = videoAdapter.getView(j, null, null);
+                add.setId(j);
+                add.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent myIntent = new Intent(previewFragment.getContext(),
+                                FullscreenVideoActivity.class);
+                        myIntent.putExtra(VIDEO_URL, getStringArrayOfVideoURL(currentPost.getVideos()));
+                        myIntent.putExtra(POSITION, v.getId());
+                        //deleted context
+                        startActivity(myIntent, null);
+                    }
+                });
+                videoGallery.addView(add);
+            }
+        }
+    }
+
+    private String[] getStringArrayOfVideoURL(List<VideoItem> videoItems){
+        List<String> videosURL = new ArrayList<>();
+
+        for (int k=0; k<videoItems.size(); k++){
+            videosURL.add(videoItems.get(k).getVideoURL());
+        }
+        return (String[]) videosURL.toArray(new String[videosURL.size()]);
     }
 }
