@@ -54,7 +54,7 @@ public class PhotoAdapter extends BaseAdapter {
             photo.setClipToOutline(true);
         }
 
-        Glide.with(context).load(photos.get(position)).apply(new RequestOptions().override(600, 200))
+        Glide.with(context).load(photos.get(position)).apply(new RequestOptions().override(300, 300))
                 .apply(new RequestOptions().centerCrop()).into(photo);
 
         view.setPadding(0, 0, 20, 0);

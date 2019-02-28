@@ -1,9 +1,15 @@
 package com.heapixLearn.discovery.ui.post.preview.entity;
 
 public class VideoItem {
-    String videoURL;
-    String thumbnailURL;
-    String duration;
+    private String videoURL;
+    private String thumbnailURL;
+    private String duration;
+
+    public VideoItem(String videoURL, String thumbnailURL, String duration) {
+        this.videoURL = videoURL;
+        this.thumbnailURL = thumbnailURL;
+        this.duration = duration;
+    }
 
     public String getDuration() {
         return duration;

@@ -15,12 +15,18 @@ public class PostManager implements IPostManager {
         posts.add(new Post("Post1" , 3,
                 new ArrayList<String>(Arrays.asList(
                         "https://storge.pic2.me/c/1360x800/555/57753010826d4.jpg",
-                        "https://siliconangle.com/files/2013/10/chrome-hacked-story-300x300.jpg",
+                        "https://i.imgur.com/DvpvklR.png",
                         "https://siliconangle.com/files/2013/10/chrome-hacked-story-300x300.jpg",
                         "https://siliconangle.com/files/2013/10/chrome-hacked-story-300x300.jpg",
                         "https://siliconangle.com/files/2013/10/chrome-hacked-story-300x300.jpg"
                 )),
-                new ArrayList<VideoItem>(){},
+                new ArrayList<VideoItem>(Arrays.asList(
+                        new VideoItem(
+                                "https://videocdn.bodybuilding.com/video/mp4/62000/62792m.mp4",
+                                "https://i.imgur.com/DvpvklR.png",
+                                "1:20"
+                        )
+                )),
                 "Soligorsk",
                 150, 25,
                 false, true)

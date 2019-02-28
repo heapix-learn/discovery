@@ -1,5 +1,6 @@
 package com.heapixLearn.discovery.ui.post.preview.fullscreen_media;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -129,11 +130,11 @@ public class CustomViewPager extends ViewGroup {
 
     public interface OnPageChangeListener {
 
-        void onPageScrolled(int position, float positionOffset, int positionOffsetPixels);
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels);
 
-        void onPageSelected(int position);
+        public void onPageSelected(int position);
 
-        void onPageScrollStateChanged(int state);
+        public void onPageScrollStateChanged(int state);
     }
 
     public static class SimpleOnPageChangeListener implements OnPageChangeListener {
@@ -543,12 +544,13 @@ public class CustomViewPager extends ViewGroup {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static class SavedState extends BaseSavedState {
         int position;
         Parcelable adapterState;
         ClassLoader loader;
 
-        public SavedState(Parcelable superState) {
+        SavedState(Parcelable superState) {
             super(superState);
         }
 
@@ -652,7 +654,7 @@ public class CustomViewPager extends ViewGroup {
     ItemInfo infoForAnyChild(View child) {
         ViewParent parent;
         while ((parent = child.getParent()) != this) {
-            if (parent == null || !(parent instanceof View)) {
+            if (!(parent instanceof View)) {
                 return null;
             }
             child = (View) parent;
@@ -902,6 +904,7 @@ public class CustomViewPager extends ViewGroup {
         return mIsBeingDragged;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         if (mFakeDragging) {
@@ -1018,8 +1021,7 @@ public class CustomViewPager extends ViewGroup {
                 break;
             case MotionEventCompat.ACTION_POINTER_DOWN: {
                 final int index = MotionEventCompat.getActionIndex(ev);
-                final float x = MotionEventCompat.getX(ev, index);
-                mLastMotionX = x;
+                mLastMotionX = MotionEventCompat.getX(ev, index);
                 mActivePointerId = MotionEventCompat.getPointerId(ev, index);
                 break;
             }
@@ -1336,9 +1338,7 @@ public class CustomViewPager extends ViewGroup {
                     isInTouchMode() && !isFocusableInTouchMode()) {
                 return;
             }
-            if (views != null) {
-                views.add(this);
-            }
+            views.add(this);
         }
     }
 

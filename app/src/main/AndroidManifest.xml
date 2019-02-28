@@ -20,6 +20,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.post.preview.fullscreen_media.FullscreenPhotoActivity" />
+        <activity android:name=".ui.post.preview.fullscreen_media.FullscreenVideoActivity" />
     </application>
 
 </manifest>

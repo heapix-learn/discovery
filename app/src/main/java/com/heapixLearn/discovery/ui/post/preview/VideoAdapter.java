@@ -62,7 +62,7 @@ public class VideoAdapter extends BaseAdapter {
 
         Glide.with(context)
                 .load(videoItems.get(position).getThumbnailURL())
-                .apply(new RequestOptions().override(350, 250))
+                .apply(new RequestOptions().override(300, 300))
                 .apply(new RequestOptions().centerCrop())
                 .into(thumbnail);
 
