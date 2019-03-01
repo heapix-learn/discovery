@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -62,7 +63,7 @@ public class VideoAdapter extends BaseAdapter {
 
         Glide.with(context)
                 .load(videoItems.get(position).getThumbnailURL())
-                .apply(new RequestOptions().override(300, 300))
+                .apply(new RequestOptions().override(250, 250))
                 .apply(new RequestOptions().centerCrop())
                 .into(thumbnail);
 

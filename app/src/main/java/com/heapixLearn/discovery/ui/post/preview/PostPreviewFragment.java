@@ -38,6 +38,8 @@ public class PostPreviewFragment extends Fragment implements View.OnClickListene
     private static final String POSITION ="position";
     private static final String VIDEO_URL = "videosURL";
 
+    private static final int CODE_FOLLOWERS = 0;
+    private static final int CODE_COMMENTS = 1;
 
     CircleImageView avatar;
     TextView username;
@@ -84,7 +86,7 @@ public class PostPreviewFragment extends Fragment implements View.OnClickListene
         @Override
         public void run() {
             Toast.makeText(getContext(), Objects.requireNonNull(getContext())
-                            .getString(R.string.follow_on_failure), Toast.LENGTH_SHORT).show();
+                            .getString(R.string.unable_to_update_data), Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -94,13 +96,9 @@ public class PostPreviewFragment extends Fragment implements View.OnClickListene
             if(currentUser.isPostLiked(currentPost.getId())){
                 currentUser.setLiked(currentPost.getId(), false);
                 btnLike.setBackgroundResource(R.drawable.button_like);
-                Toast.makeText(getContext(), Objects.requireNonNull(getContext())
-                        .getString(R.string.post_not_liked), Toast.LENGTH_SHORT).show();
             } else {
                 currentUser.setLiked(currentPost.getId(), true);
                 btnLike.setBackgroundResource(R.drawable.button_liked);
-                Toast.makeText(getContext(), Objects.requireNonNull(getContext())
-                        .getString(R.string.post_liked), Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -110,7 +108,7 @@ public class PostPreviewFragment extends Fragment implements View.OnClickListene
         @Override
         public void run() {
             Toast.makeText(getContext(), Objects.requireNonNull(getContext())
-                    .getString(R.string.like_on_failure), Toast.LENGTH_SHORT).show();
+                    .getString(R.string.unable_to_update_data), Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -165,7 +163,10 @@ public class PostPreviewFragment extends Fragment implements View.OnClickListene
 
         postManager = new PostManager();
         userManager = new UserManager();
-        //TODO : add id from other fragment via Bundle
+
+        /*currentPost = (IPost) Objects.requireNonNull(getActivity()).getIntent()
+                .getSerializableExtra("post");*/
+
         currentPost = postManager.getPostById(0);
         currentUser = userManager.getUserByAccountId(currentPost.getAccountId());
 
@@ -192,12 +193,11 @@ public class PostPreviewFragment extends Fragment implements View.OnClickListene
                 .into(avatar);
 
         username.setText(currentUser.getName());
-        followers.setText(String.valueOf(currentUser.getFollowers()) + " " +
-                getString(R.string.str_followers));
+        setTextNumbers(CODE_FOLLOWERS, followers, currentUser.getFollowers());
 
         nameLocation.setText(currentPost.getNameLocation());
-        quantityLikes.setText(currentPost.getLikes() + " " + getString(R.string.str_likes));
-        quantityComments.setText(currentPost.getComments() + " " + getString(R.string.str_comments));
+        quantityLikes.setText(currentPost.getLikes() + " " + getString(R.string.like));
+        setTextNumbers(CODE_COMMENTS, quantityComments, currentPost.getComments());
 
         if(currentUser.isFriend()){
             btnFollow.setBackgroundResource(R.drawable.button_follower);
@@ -217,6 +217,41 @@ public class PostPreviewFragment extends Fragment implements View.OnClickListene
         initVideos();
 
         return previewFragment;
+    }
+
+    private void setTextNumbers(int code, TextView textView, int quantity){
+        switch (code){
+            case 0:
+                if(quantity % 10 == 1){
+                    String followersOne = quantity + " " + previewFragment.getContext()
+                            .getString(R.string.followers_1);
+                    textView.setText(followersOne);
+                } else if(quantity % 10 >= 2 && quantity % 10 <= 4) {
+                    String followersTwoFour = quantity + " " +  previewFragment.getContext()
+                            .getString(R.string.followers_2_4);
+                    textView.setText(followersTwoFour);
+                } else {
+                    String followersDefault = quantity + " " + previewFragment.getContext()
+                            .getString(R.string.followers_default);
+                    textView.setText(followersDefault);
+                }
+                break;
+            case 1:
+                if(quantity % 10 == 1){
+                    String commentsOne = quantity + " " + previewFragment.getContext()
+                            .getString(R.string.comments_1);
+                    textView.setText(commentsOne);
+                } else if(quantity % 10 >= 2 && quantity % 10 <= 4) {
+                    String commentsTwoFour = quantity + " " +  previewFragment.getContext()
+                            .getString(R.string.comments_2_4);
+                    textView.setText(commentsTwoFour);
+                } else {
+                    String commentsDefault = quantity + " " + previewFragment.getContext()
+                            .getString(R.string.comments_default);
+                    textView.setText(commentsDefault);
+                }
+                break;
+        }
     }
 
     @Override

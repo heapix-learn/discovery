@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="open_in_maps">Открыть на карте</string>
+    <string name="contact_follow">Подписка оформлена</string>
+    <string name="contact_unfollow">Подписка отменена</string>
+    <string name="unable_to_update_data">Невозможно обновить данные</string>
+    <string name="photos">Фото</string>
+    <string name="videos">Видео</string>
+    <string name="followers_2_4">Подписчика</string>
+    <string name="followers_1">Подписчик</string>
+    <string name="followers_default">Подписчиков</string>
+    <string name="like">Нравится</string>
+    <string name="comments_2_4">Комментария</string>
+    <string name="comments_1">Комментарий</string>
+    <string name="comments_default">Комментариев</string>
+</resources>

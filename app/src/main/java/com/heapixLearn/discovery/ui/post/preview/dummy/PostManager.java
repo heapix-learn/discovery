@@ -28,7 +28,7 @@ public class PostManager implements IPostManager {
                         )
                 )),
                 "Soligorsk",
-                150, 25,
+                150, 3,
                 false, true)
         );
 

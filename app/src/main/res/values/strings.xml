@@ -1,18 +1,20 @@
 <resources>
-    <string name="app_name">Discovery</string>
+    <string name="app_name" translatable="false">Discovery</string>
     <string name="open_in_maps">Open in maps</string>
-    <string name="str_likes">Likes</string>
-    <string name="str_comments">Comments</string>
-    <string name="str_followers">Followers</string>
+
+    <string name="followers_2_4">Followers</string>
+    <string name="followers_1">Follower</string>
+    <string name="followers_default">Followers</string>
+
+    <string name="like">Like</string>
+
+    <string name="comments_2_4">Comments</string>
+    <string name="comments_1">Comment</string>
+    <string name="comments_default">Comments</string>
 
     <string name="contact_follow">Subscription issued</string>
     <string name="contact_unfollow">Subscription canceled</string>
-    <string name="follow_on_failure">Unable to subscribe</string>
     <string name="unable_to_update_data">Unable to update data</string>
-
-    <string name="post_liked">Post liked</string>
-    <string name="post_not_liked">Post not liked</string>
-    <string name="like_on_failure">Unable to like</string>
 
     <string name="photos">Photos</string>
     <string name="videos">Videos</string>
