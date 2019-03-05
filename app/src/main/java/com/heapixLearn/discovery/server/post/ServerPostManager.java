@@ -23,9 +23,9 @@ public class ServerPostManager {
         postApi = com.heapixLearn.discovery.server.PostController.getApi(authStore.getToken());
     }
 
-    public void getPreviousPost(String id, final RunnableWithObject<ServerPost> onSuccess,
+    public void getNewerPost(Long time, final RunnableWithObject<ServerPost> onSuccess,
                             final RunnableWithObject<TypeOfServerError> onFailure){
-        postApi.getPreviousPost(id).enqueue(new Callback<ServerPost>() {
+        postApi.getNewerPost(time).enqueue(new Callback<ServerPost>() {
             @Override
             public void onResponse(Call<ServerPost> call, Response<ServerPost> response) {
                 checkError(response.code(), onFailure);
@@ -43,9 +43,9 @@ public class ServerPostManager {
         });
     }
 
-    public void getNextPost(String id, final RunnableWithObject<ServerPost> onSuccess,
+    public void getOlderPost(Long time, final RunnableWithObject<ServerPost> onSuccess,
                           final RunnableWithObject<TypeOfServerError> onFailure){
-        postApi.getNextPost(id).enqueue(new Callback<ServerPost>() {
+        postApi.getOlderPost(time).enqueue(new Callback<ServerPost>() {
             @Override
             public void onResponse(Call<ServerPost> call, Response<ServerPost> response) {
                 checkError(response.code(), onFailure);

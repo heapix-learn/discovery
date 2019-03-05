@@ -18,11 +18,11 @@ public interface PostApi {
     @POST("/posts")
     Call<ServerPost> createPost(@Body ServerPost post);
 
-    @GET("/posts/{id}")
-    Call<ServerPost> getPreviousPost(@Path("id") String id);
+    @GET("/posts")
+    Call<ServerPost> getNewerPost(@Header("Request-Time") Long time);
 
-    @GET("/posts/{id}")
-    Call<ServerPost> getNextPost(@Path("id") String id);
+    @GET("/posts")
+    Call<ServerPost> getOlderPost(@Header("Request-Time") Long time);
 
     @GET("/posts/{id}")
     Call<List<ServerPost>> getPostsByUserId(@Query("id") String id);
