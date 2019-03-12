@@ -5,7 +5,6 @@ import com.heapixLearn.discovery.Entity.Post;
 import java.util.List;
 
 public interface DBPostManagerI {
-    List<Post> getAll();
     Post getById(int id);
     Post getByIndex(int index);
     List<Post> getList(int start, int stop);

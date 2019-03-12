@@ -14,9 +14,7 @@ public class PostManager {
     private final int MIN_RESERVE = 5;
     private ServerPostManagerI serverManager;
     private DBPostManagerI dbManager;
-    private Thread newPostsThread;
-    private Thread thread;
-    private ExecutorService executorService = Executors.newFixedThreadPool(2);
+    private ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     private PostManager() {
         //TODO init server & DB
@@ -34,8 +32,6 @@ public class PostManager {
     public void getFirstPosts(int amount,
                               RunnableWithObject<List<Post>> onSuccess,
                               RunnableWithObject<TypeOfServerError> onFail) {
-        joinAllThreads();
-
         if (amount <= 0) {
             onSuccess.init(null).run();
             return;
@@ -56,8 +52,6 @@ public class PostManager {
     public void getPosts(Post post, int amount,
                          RunnableWithObject<List<Post>> onSuccess,
                          RunnableWithObject<TypeOfServerError> onFail) {
-        joinAllThreads();
-
         if (checkInputData(post, amount)) {
             onSuccess.init(null).run();
             return;
@@ -107,7 +101,7 @@ public class PostManager {
     public void getByID(int id,
                         RunnableWithObject<Post> onSuccess,
                         RunnableWithObject<TypeOfServerError> onFail) {
-        new Thread(() -> {
+        executorService.submit(() -> {
             RunnableWithObject<Post> success = new RunnableWithObject<Post>() {
                 @Override
                 public void run() {
@@ -116,14 +110,13 @@ public class PostManager {
             };
 
             serverManager.getById(id, success, getOnFailRunnable(onFail));
-        }).start();
+        });
     }
 
     public void addPost(Post post,
                         RunnableWithObject<Post> onSuccess,
                         RunnableWithObject<TypeOfServerError> onFail) {
-        joinThread(thread);
-        thread = new Thread(() -> {
+        executorService.submit(() -> {
             RunnableWithObject<Post> success = new RunnableWithObject<Post>() {
                 @Override
                 public void run() {
@@ -134,14 +127,12 @@ public class PostManager {
             };
             serverManager.insert(post, success, getOnFailRunnable(onFail));
         });
-        thread.start();
     }
 
     public void removePost(Post post,
                            Runnable onSuccess,
                            RunnableWithObject<TypeOfServerError> onFail) {
-        joinThread(thread);
-        thread = new Thread(() -> {
+        executorService.submit(() -> {
             Runnable success = () -> {
                 dbManager.delete(post);
                 onSuccess.run();
@@ -149,15 +140,12 @@ public class PostManager {
 
             serverManager.delete(post, success, getOnFailRunnable(onFail));
         });
-
-        thread.start();
     }
 
     public void updatePost(Post post,
                            Runnable onSuccess,
                            RunnableWithObject<TypeOfServerError> onFail) {
-        joinThread(thread);
-        thread = new Thread(() -> {
+        executorService.submit(() -> {
             Runnable success = () -> {
                 dbManager.update(post);
                 onSuccess.run();
@@ -165,7 +153,6 @@ public class PostManager {
 
             serverManager.update(post, success, getOnFailRunnable(onFail));
         });
-        thread.start();
     }
 
     private RunnableWithObject<TypeOfServerError> getOnFailRunnable(
@@ -176,20 +163,6 @@ public class PostManager {
                 onFail.init(getObject()).run();
             }
         };
-    }
-
-    private void joinAllThreads() {
-        joinThread(newPostsThread);
-        joinThread(thread);
-    }
-
-    private void joinThread(Thread thread) {
-        if (thread != null) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-            }
-        }
     }
 
     private void addPostToDB(Post post) {
@@ -205,7 +178,7 @@ public class PostManager {
         RunnableWithObject<List<Post>> onSuccess = new RunnableWithObject<List<Post>>() {
             @Override
             public void run() {
-                getNewPostsThread(getObject()).start();
+                executorService.submit(getNewPostsRunnable(getObject()));
             }
         };
 
@@ -218,7 +191,7 @@ public class PostManager {
             @Override
             public void run() {
                 dbManager.clear();
-                getNewPostsThread(getObject()).start();
+                executorService.submit(getNewPostsRunnable(getObject()));
 
                 onSuccess.run();
             }
@@ -227,12 +200,11 @@ public class PostManager {
         serverManager.getPostList(System.currentTimeMillis(), MIN_RESERVE * 3, success, getOnFailRunnable(onFail));
     }
 
-    private Thread getNewPostsThread(List<Post> newPosts) {
-        joinAllThreads();
-        return newPostsThread = new Thread(() -> {
+    private Runnable getNewPostsRunnable(List<Post> newPosts) {
+        return () -> {
             for (Post post : newPosts) {
                 addPostToDB(post);
             }
-        });
+        };
     }
 }
