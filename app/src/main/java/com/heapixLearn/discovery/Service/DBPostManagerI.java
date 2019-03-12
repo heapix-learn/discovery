@@ -7,7 +7,10 @@ import java.util.List;
 public interface DBPostManagerI {
     List<Post> getAll();
     Post getById(int id);
+    Post getByIndex(int index);
+    List<Post> getList(int start, int stop);
     int size();
+    int indexOf(Post post);
     void clear();
     void insert(Post post);
     void delete(Post post);
