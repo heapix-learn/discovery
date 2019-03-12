@@ -12,11 +12,11 @@ public class Post implements Comparable<Post> {
     private List<VideoItem> videoList;
     private double lat;
     private double lng;
-    private int date;
+    private long time;
 
     public Post(
             int access, int userId, String description, String title,
-            List<String> imgRefList, List<VideoItem> videoList, double lat, double lng, int date) {
+            List<String> imgRefList, List<VideoItem> videoList, double lat, double lng, long time) {
         this.access = access;
         this.userId = userId;
         this.description = description;
@@ -25,12 +25,12 @@ public class Post implements Comparable<Post> {
         this.videoList = videoList;
         this.lat = lat;
         this.lng = lng;
-        this.date = date;
+        this.time = time;
     }
 
     @Override
     public int compareTo(Post o) {
-        return o.getDate() - date;
+        return (int)(o.getTime() - time);
     }
 
     public int getId() {
@@ -105,11 +105,11 @@ public class Post implements Comparable<Post> {
         this.lng = lng;
     }
 
-    public int getDate() {
-        return date;
+    public long getTime() {
+        return time;
     }
 
-    public void setDate(int date) {
-        this.date = date;
+    public void setTime(long time) {
+        this.time = time;
     }
 }
