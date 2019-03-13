@@ -12,6 +12,7 @@ public class PostManager {
     private static PostManager instance;
     private final int DB_MAX_AMOUNT = 100;
     private final int MIN_RESERVE = 5;
+    private final int SERVER_REQUEST_SIZE = MIN_RESERVE * 3;
     private ServerPostManagerI serverManager;
     private DBPostManagerI dbManager;
     private ExecutorService executorService = Executors.newFixedThreadPool(4);
@@ -32,59 +33,62 @@ public class PostManager {
     public void getFirstPosts(int amount,
                               RunnableWithObject<List<Post>> onSuccess,
                               RunnableWithObject<TypeOfServerError> onFail) {
-        if (amount <= 0) {
-            onSuccess.init(null).run();
-            return;
-        }
+        executorService.submit(() -> {
+            List<Post> result;
 
-        int lastIndex = dbManager.size() - 1;
+            if (amount <= 0) {
+                result = null;
+            } else {
+                int maxIndex = dbManager.size() - 1;
 
-        if (lastIndex < amount) {
-            loadOlderPostsFromServer(onFail);
-            onSuccess.init(dbManager.getList(0, lastIndex)).run();
-            return;
-        }
+                checkReserve(maxIndex, onFail);
 
-        checkReserve(amount, onFail);
-        onSuccess.init(dbManager.getList(0, amount)).run();
+                result = dbManager.getList(0, maxIndex);
+            }
+
+            onSuccess.init(result).run();
+        });
     }
 
     public void getPosts(Post post, int amount,
                          RunnableWithObject<List<Post>> onSuccess,
                          RunnableWithObject<TypeOfServerError> onFail) {
-        if (checkInputData(post, amount)) {
-            onSuccess.init(null).run();
-            return;
-        }
+        executorService.submit(() -> {
+            List<Post> result;
 
-        int start = dbManager.indexOf(post) + 1;
-        int stop = start + amount;
-        int lastIndex = dbManager.size() - 1;
+            if (checkInputData(post, amount)) {
+                result = null;
+            } else {
+                int firstPostIndex = dbManager.indexOf(post) + 1;
+                int lastPostIndex = firstPostIndex + amount;
 
-        if (lastIndex < stop) {
-            loadOlderPostsFromServer(onFail);
-            onSuccess.init(dbManager.getList(start, lastIndex)).run();
-            return;
-        }
+                checkReserve(lastPostIndex, onFail);
 
-        checkReserve(stop, onFail);
-        onSuccess.init(dbManager.getList(start, stop)).run();
+                result = dbManager.getList(firstPostIndex, lastPostIndex);
+            }
+
+            onSuccess.init(result).run();
+        });
     }
 
     private boolean checkInputData(Post post, int amount) {
         return post == null || amount <= 0 || dbManager.getById(post.getId()) == null;
     }
 
-    private void checkReserve(int lastRequested, RunnableWithObject<TypeOfServerError> onFail) {
-        int reserve = dbManager.size() - 1 - lastRequested;
-        if (reserve < MIN_RESERVE) {
+    private void checkReserve(int lastPostIndex, RunnableWithObject<TypeOfServerError> onFail){
+        while (!isEnoughPosts(lastPostIndex)) {
             loadOlderPostsFromServer(onFail);
         }
     }
 
-    public void getByUserID(int userId,
-                            RunnableWithObject<List<Post>> onSuccess,
-                            RunnableWithObject<TypeOfServerError> onFail) {
+    private boolean isEnoughPosts(int lastRequested) {
+        int reserve = dbManager.size() - 1 - lastRequested;
+        return reserve >= MIN_RESERVE;
+    }
+
+    public void getPostListByUserID(int userId,
+                                    RunnableWithObject<List<Post>> onSuccess,
+                                    RunnableWithObject<TypeOfServerError> onFail) {
 
         executorService.submit(() -> {
             RunnableWithObject<List<Post>> success = new RunnableWithObject<List<Post>>() {
@@ -98,9 +102,9 @@ public class PostManager {
         });
     }
 
-    public void getByID(int id,
-                        RunnableWithObject<Post> onSuccess,
-                        RunnableWithObject<TypeOfServerError> onFail) {
+    public void getPostByID(int id,
+                            RunnableWithObject<Post> onSuccess,
+                            RunnableWithObject<TypeOfServerError> onFail) {
         executorService.submit(() -> {
             RunnableWithObject<Post> success = new RunnableWithObject<Post>() {
                 @Override
@@ -137,7 +141,6 @@ public class PostManager {
                 dbManager.delete(post);
                 onSuccess.run();
             };
-
             serverManager.delete(post, success, getOnFailRunnable(onFail));
         });
     }
@@ -168,43 +171,44 @@ public class PostManager {
     private void addPostToDB(Post post) {
         int dbSize = dbManager.size();
         if (dbSize >= DB_MAX_AMOUNT) {
-            Post p = dbManager.getByIndex(dbSize - DB_MAX_AMOUNT);
+            Post p = dbManager.getByIndex(0);
             dbManager.delete(p);
         }
         dbManager.insert(post);
     }
 
     private void loadOlderPostsFromServer(RunnableWithObject<TypeOfServerError> onFail) {
-        RunnableWithObject<List<Post>> onSuccess = new RunnableWithObject<List<Post>>() {
-            @Override
-            public void run() {
-                executorService.submit(getNewPostsRunnable(getObject()));
-            }
-        };
-
-        long lastPostTime = dbManager.getByIndex(dbManager.size() - 1).getTime();
-        serverManager.getPostList(lastPostTime, MIN_RESERVE * 3, onSuccess, getOnFailRunnable(onFail));
+        executorService.submit(() -> {
+            RunnableWithObject<List<Post>> onSuccess = new RunnableWithObject<List<Post>>() {
+                @Override
+                public void run() {
+                    addPostListToDb(getObject());
+                }
+            };
+            long lastPostTime = dbManager.getByIndex(dbManager.size() - 1).getTime();
+            serverManager.getPostList(lastPostTime, SERVER_REQUEST_SIZE, onSuccess, getOnFailRunnable(onFail));
+        });
     }
 
     public void loadNewPostsFromServer(Runnable onSuccess, RunnableWithObject<TypeOfServerError> onFail) {
-        RunnableWithObject<List<Post>> success = new RunnableWithObject<List<Post>>() {
-            @Override
-            public void run() {
-                dbManager.clear();
-                executorService.submit(getNewPostsRunnable(getObject()));
+        executorService.submit(() -> {
+            RunnableWithObject<List<Post>> success = new RunnableWithObject<List<Post>>() {
+                @Override
+                public void run() {
+                    dbManager.clear();
+                    addPostListToDb(getObject());
 
-                onSuccess.run();
-            }
-        };
+                    onSuccess.run();
+                }
+            };
 
-        serverManager.getPostList(System.currentTimeMillis(), MIN_RESERVE * 3, success, getOnFailRunnable(onFail));
+            serverManager.getPostList(System.currentTimeMillis(), SERVER_REQUEST_SIZE, success, getOnFailRunnable(onFail));
+        });
     }
 
-    private Runnable getNewPostsRunnable(List<Post> newPosts) {
-        return () -> {
-            for (Post post : newPosts) {
-                addPostToDB(post);
-            }
-        };
+    private void addPostListToDb(List<Post> newPosts) {
+        for (Post post : newPosts) {
+            addPostToDB(post);
+        }
     }
 }
