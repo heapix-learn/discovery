@@ -15,7 +15,7 @@ public class PostManager {
     private final int SERVER_REQUEST_SIZE = MIN_RESERVE * 3;
     private ServerPostManagerI serverManager;
     private DBPostManagerI dbManager;
-    private ExecutorService executorService = Executors.newFixedThreadPool(4);
+    private ExecutorService executorService = Executors.newFixedThreadPool(6);
 
     private PostManager() {
         //TODO init server & DB
@@ -78,6 +78,9 @@ public class PostManager {
     private void checkReserve(int lastPostIndex, RunnableWithObject<TypeOfServerError> onFail){
         while (!isEnoughPosts(lastPostIndex)) {
             loadOlderPostsFromServer(onFail);
+            try {
+                wait();
+            } catch (InterruptedException e){}
         }
     }
 
@@ -183,6 +186,7 @@ public class PostManager {
                 @Override
                 public void run() {
                     addPostListToDb(getObject());
+                    notify();
                 }
             };
             long lastPostTime = dbManager.getByIndex(dbManager.size() - 1).getTime();
