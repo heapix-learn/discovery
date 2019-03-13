@@ -1,6 +1,6 @@
-package com.heapixLearn.discovery.Service;
+package com.heapixLearn.discovery.service;
 
-import com.heapixLearn.discovery.Entity.Post;
+import com.heapixLearn.discovery.entity.Post;
 
 import java.util.List;
 

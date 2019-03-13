@@ -1,8 +1,8 @@
-package com.heapixLearn.discovery.Service;
+package com.heapixLearn.discovery.service;
 
-import com.heapixLearn.discovery.Entity.Post;
-import com.heapixLearn.discovery.Entity.RunnableWithObject;
-import com.heapixLearn.discovery.Entity.TypeOfServerError;
+import com.heapixLearn.discovery.entity.Post;
+import com.heapixLearn.discovery.entity.RunnableWithObject;
+import com.heapixLearn.discovery.entity.TypeOfServerError;
 
 import java.util.List;
 

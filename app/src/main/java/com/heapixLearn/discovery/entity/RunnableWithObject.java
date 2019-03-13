@@ -1,4 +1,4 @@
-package com.heapixLearn.discovery.Entity;
+package com.heapixLearn.discovery.entity;
 
 public abstract class RunnableWithObject<T> implements Runnable {
     private T object;
